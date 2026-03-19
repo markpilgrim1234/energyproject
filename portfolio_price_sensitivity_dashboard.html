@@ -3,39 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Project Financing Dashboard</title>
+  <title>Portfolio Power Price Sensitivity Dashboard</title>
   <style>
     :root {
-      --bg: #f6f8fc;
-      --panel: rgba(255,255,255,0.78);
-      --panel-strong: rgba(255,255,255,0.94);
+      --bg: #ffffff;
+      --panel: #ffffff;
+      --panel-2: #f5f7fb;
       --text: #0f172a;
       --muted: #64748b;
-      --accent: #2563eb;
-      --accent-2: #06b6d4;
+      --accent: #0ea5e9;
+      --accent-2: #2563eb;
+      --danger: #ef4444;
+      --border: rgba(0,0,0,0.08);
+      --shadow: 0 10px 25px rgba(0,0,0,0.08);
       --good: #16a34a;
       --bad: #dc2626;
       --warn: #d97706;
-      --border: rgba(148,163,184,0.22);
-      --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
-      --radius: 24px;
     }
 
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
       color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(37,99,235,0.10), transparent 28%),
-        radial-gradient(circle at top right, rgba(6,182,212,0.10), transparent 22%),
-        linear-gradient(180deg, #f8fbff 0%, #f6f8fc 100%);
       min-height: 100vh;
     }
 
-    .shell {
-      max-width: 1480px;
+    .container {
+      max-width: 1500px;
       margin: 0 auto;
       padding: 28px;
     }
@@ -50,63 +46,58 @@
 
     .hero h1 {
       margin: 0;
-      font-size: clamp(32px, 4.3vw, 52px);
-      line-height: 1;
-      letter-spacing: -0.04em;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
     }
 
     .hero p {
-      margin: 10px 0 0;
-      max-width: 880px;
+      margin: 8px 0 0;
       color: var(--muted);
-      line-height: 1.55;
-      font-size: 15px;
+      max-width: 900px;
+      line-height: 1.5;
     }
 
     .badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.72);
-      backdrop-filter: blur(14px);
+      padding: 8px 12px;
       border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #f8fafc;
       color: var(--muted);
       font-size: 13px;
       white-space: nowrap;
-      box-shadow: var(--shadow);
     }
 
     .layout {
       display: grid;
-      grid-template-columns: 430px 1fr;
+      grid-template-columns: 480px 1fr;
       gap: 24px;
-      align-items: start;
     }
 
     .panel {
       background: var(--panel);
-      backdrop-filter: blur(18px);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: 24px;
       box-shadow: var(--shadow);
       overflow: hidden;
     }
 
-    .panel-head {
-      padding: 22px 22px 14px;
-      border-bottom: 1px solid rgba(148,163,184,0.16);
-      background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.40));
+    .panel-header {
+      padding: 20px 22px 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      background: #ffffff;
     }
 
-    .panel-head h2 {
+    .panel-header h2, .chart-head h3 {
       margin: 0;
       font-size: 18px;
       letter-spacing: -0.02em;
     }
 
-    .panel-head p {
+    .panel-header p, .chart-head p {
       margin: 6px 0 0;
       color: var(--muted);
       font-size: 13px;
@@ -114,9 +105,9 @@
     }
 
     .inputs {
-      padding: 20px 22px 22px;
+      padding: 18px 22px 22px;
       display: grid;
-      gap: 18px;
+      gap: 20px;
     }
 
     fieldset {
@@ -124,17 +115,16 @@
       padding: 0;
       border: 0;
       display: grid;
-      gap: 12px;
+      gap: 14px;
     }
 
     legend {
-      padding: 0;
-      font-size: 12px;
-      font-weight: 800;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
       color: var(--accent);
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .grid-2, .grid-3 {
@@ -147,13 +137,12 @@
 
     .field {
       display: grid;
-      gap: 7px;
+      gap: 8px;
     }
 
     .field label {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--muted);
-      font-weight: 600;
     }
 
     .input-wrap {
@@ -164,10 +153,9 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      color: #94a3b8;
-      font-size: 12px;
+      color: var(--muted);
+      font-size: 13px;
       pointer-events: none;
-      z-index: 2;
     }
 
     .prefix { left: 12px; }
@@ -175,55 +163,102 @@
 
     input, select {
       width: 100%;
-      border: 1px solid rgba(148,163,184,0.24);
-      background: rgba(255,255,255,0.92);
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: var(--panel-2);
       color: var(--text);
-      border-radius: 16px;
-      padding: 13px 14px;
-      font-size: 14px;
+      font-size: 15px;
       outline: none;
-      transition: 0.18s ease;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+      transition: border-color 0.15s ease, transform 0.12s ease;
     }
 
     .has-prefix input { padding-left: 28px; }
     .has-suffix input, .has-suffix select { padding-right: 54px; }
 
     input:focus, select:focus {
-      border-color: rgba(37,99,235,0.45);
-      box-shadow: 0 0 0 4px rgba(37,99,235,0.10);
+      border-color: rgba(14,165,233,0.8);
       transform: translateY(-1px);
     }
 
     .actions {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       flex-wrap: wrap;
       padding-top: 4px;
     }
 
     button {
       border: 0;
-      border-radius: 16px;
-      padding: 13px 16px;
+      border-radius: 14px;
+      padding: 12px 16px;
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 700;
       cursor: pointer;
-      transition: 0.18s ease;
+      transition: transform 0.12s ease, opacity 0.15s ease;
     }
 
     button:hover { transform: translateY(-1px); }
-
-    .primary {
+    button.primary {
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       color: white;
-      box-shadow: 0 14px 28px rgba(37,99,235,0.20);
     }
-
-    .secondary {
-      background: rgba(255,255,255,0.92);
+    button.secondary {
+      background: #f8fafc;
       color: var(--text);
       border: 1px solid var(--border);
+    }
+    button.ghost {
+      background: white;
+      color: var(--accent-2);
+      border: 1px dashed rgba(37,99,235,0.35);
+    }
+
+    .portfolio-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .asset-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .asset-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .asset-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .asset-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .asset-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .remove-btn {
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #fff5f5;
+      color: var(--danger);
+      border: 1px solid rgba(239,68,68,0.15);
+      font-size: 12px;
     }
 
     .right-col {
@@ -234,93 +269,61 @@
     .summary {
       padding: 22px;
       display: grid;
-      gap: 16px;
+      gap: 18px;
     }
 
-    .kpi-grid-top {
+    .kpi-main {
       display: grid;
-      grid-template-columns: 1.25fr 1fr;
+      grid-template-columns: 1.35fr 1fr;
       gap: 16px;
+      align-items: stretch;
     }
 
-    .hero-card, .mini-stack, .metric {
-      background: var(--panel-strong);
+    .big-card, .mini-card, .metric {
+      background: #ffffff;
       border: 1px solid var(--border);
-      border-radius: 22px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
-    }
-
-    .hero-card {
+      border-radius: 20px;
       padding: 20px;
-      background: linear-gradient(135deg, rgba(37,99,235,0.92), rgba(6,182,212,0.88));
-      color: white;
-      border: 0;
-      box-shadow: 0 22px 40px rgba(37,99,235,0.22);
     }
 
-    .hero-card .label,
-    .mini-card .label,
-    .metric .label {
+    .big-card .label, .mini-card .label, .metric .title {
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      opacity: 0.85;
+      color: var(--muted);
     }
 
-    .hero-card .value {
-      margin-top: 10px;
-      font-size: clamp(32px, 4vw, 52px);
-      font-weight: 900;
-      letter-spacing: -0.05em;
-      line-height: 0.95;
-    }
-
-    .hero-card .note {
-      margin-top: 10px;
-      font-size: 14px;
-      line-height: 1.45;
-      max-width: 56ch;
-      color: rgba(255,255,255,0.88);
-    }
-
-    .mini-stack {
-      display: grid;
-      gap: 14px;
-      background: transparent;
-      border: 0;
-      box-shadow: none;
-    }
-
-    .mini-card {
-      background: var(--panel-strong);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      padding: 18px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
-    }
-
-    .mini-card .value {
-      margin-top: 10px;
-      font-size: 28px;
-      font-weight: 900;
+    .big-card .value {
+      margin-top: 12px;
+      font-size: clamp(28px, 5vw, 46px);
+      font-weight: 800;
       letter-spacing: -0.04em;
+    }
+
+    .big-card .note {
+      margin-top: 8px;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+      max-width: 58ch;
+    }
+
+    .mini-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .mini-card .value, .metric .num {
+      font-size: 24px;
+      font-weight: 800;
+      margin-top: 10px;
+      letter-spacing: -0.03em;
     }
 
     .metrics {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 14px;
-    }
-
-    .metric {
-      padding: 16px;
-    }
-
-    .metric .num {
-      margin-top: 8px;
-      font-size: 24px;
-      font-weight: 900;
-      letter-spacing: -0.04em;
     }
 
     .chart-card {
@@ -330,32 +333,18 @@
     .chart-head {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
       gap: 16px;
+      align-items: flex-start;
       margin-bottom: 12px;
-    }
-
-    .chart-head h3 {
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: -0.02em;
-    }
-
-    .chart-head p {
-      margin: 6px 0 0;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.45;
-      max-width: 66ch;
     }
 
     canvas {
       width: 100%;
-      height: 320px;
+      height: 330px;
       display: block;
-      border-radius: 20px;
+      background: #ffffff;
       border: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(248,250,252,0.92));
+      border-radius: 18px;
     }
 
     .table-wrap {
@@ -366,18 +355,17 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 880px;
+      min-width: 1100px;
     }
 
     th, td {
       padding: 12px 10px;
       text-align: right;
-      border-bottom: 1px solid rgba(148,163,184,0.16);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
       font-size: 13px;
     }
 
     th:first-child, td:first-child { text-align: left; }
-
     th {
       color: var(--muted);
       font-size: 12px;
@@ -385,25 +373,13 @@
       letter-spacing: 0.05em;
       position: sticky;
       top: 0;
-      background: rgba(255,255,255,0.96);
-      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.98);
+      backdrop-filter: blur(8px);
     }
 
-    tbody tr:hover td {
-      background: rgba(37,99,235,0.03);
-    }
-
-    .positive { color: var(--good); font-weight: 800; }
-    .negative { color: var(--bad); font-weight: 800; }
-    .neutral { color: var(--muted); font-weight: 800; }
-
-    .error {
-      display: none;
-      color: var(--bad);
-      font-size: 13px;
-      padding: 0 22px 20px;
-      font-weight: 700;
-    }
+    .positive { color: var(--good); font-weight: 700; }
+    .negative { color: var(--bad); font-weight: 700; }
+    .neutral { color: var(--muted); font-weight: 700; }
 
     .footnote {
       padding: 0 22px 22px;
@@ -412,216 +388,131 @@
       line-height: 1.5;
     }
 
-    @media (max-width: 1220px) {
-      .layout { grid-template-columns: 1fr; }
-      .kpi-grid-top, .metrics { grid-template-columns: 1fr; }
+    .error {
+      color: var(--danger);
+      font-size: 13px;
+      padding: 0 22px 18px;
+      display: none;
     }
 
-    @media (max-width: 720px) {
-      .shell { padding: 16px; }
-      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    @media (max-width: 1250px) {
+      .layout { grid-template-columns: 1fr; }
+      .kpi-main, .metrics { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .container { padding: 16px; }
+      .grid-2, .grid-3, .asset-grid { grid-template-columns: 1fr; }
       .hero { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
-  <div class="shell">
+  <div class="container">
     <section class="hero">
       <div>
-        <h1>Project Financing Dashboard</h1>
+        <h1>Portfolio Power Price Sensitivity Dashboard</h1>
         <p>
-          A simplified project-finance model for a renewable asset. Enter economics, volumes, curtailment, degradation, commercial structure and financing assumptions.
-          The dashboard estimates equity NPV, equity IRR, annual DSCR and price sensitivity on IRR.
+          Build a hypothetical portfolio with up to 10 assets, define technology, MW, yield and commercial structure, then stress the reference hourly power price curve by ±10%.
+          The tool returns hourly and annual portfolio revenue sensitivity, separating fixed-price contracted revenue from merchant exposure.
         </p>
       </div>
-      <div class="badge">NPV • IRR • DSCR • Price Sensitivity</div>
+      <div class="badge">24-hour price sensitivity • up to 10 assets</div>
     </section>
 
     <div class="layout">
       <aside class="panel">
-        <div class="panel-head">
-          <h2>Inputs</h2>
-          <p>All assumptions are annual and simplified for fast scenario testing.</p>
+        <div class="panel-header">
+          <h2>Portfolio Setup</h2>
+          <p>Each asset can have a fixed-price commercial share and a merchant share exposed to hourly power prices.</p>
         </div>
+
         <div class="inputs">
           <fieldset>
-            <legend>Project Setup</legend>
-            <div class="grid-2">
+            <legend>Reference Market Curve</legend>
+            <div class="grid-3">
               <div class="field">
-                <label for="life">Project Life</label>
-                <div class="input-wrap has-suffix">
-                  <input id="life" type="number" min="1" step="1" value="25" />
-                  <span class="suffix">yrs</span>
+                <label for="referencePrice">Reference Price</label>
+                <div class="input-wrap has-prefix has-suffix">
+                  <span class="prefix">€</span>
+                  <input id="referencePrice" type="number" min="0" step="0.1" value="90" />
+                  <span class="suffix">/MWh</span>
                 </div>
               </div>
               <div class="field">
-                <label for="mw">Capacity</label>
+                <label for="priceRange">Sensitivity Range</label>
                 <div class="input-wrap has-suffix">
-                  <input id="mw" type="number" min="0" step="0.1" value="50" />
-                  <span class="suffix">MW</span>
-                </div>
-              </div>
-              <div class="field">
-                <label for="yield">Year 1 Yield</label>
-                <div class="input-wrap has-suffix">
-                  <input id="yield" type="number" min="0" step="1" value="1400" />
-                  <span class="suffix">MWh/MW</span>
-                </div>
-              </div>
-              <div class="field">
-                <label for="deg">Degradation</label>
-                <div class="input-wrap has-suffix">
-                  <input id="deg" type="number" min="0" max="100" step="0.01" value="0.5" />
+                  <input id="priceRange" type="number" min="0" max="100" step="0.1" value="10" />
                   <span class="suffix">%</span>
                 </div>
               </div>
               <div class="field">
-                <label for="curt">Curtailment</label>
-                <div class="input-wrap has-suffix">
-                  <input id="curt" type="number" min="0" max="100" step="0.1" value="3" />
-                  <span class="suffix">%</span>
-                </div>
-              </div>
-              <div class="field">
-                <label for="opexEsc">OPEX Escalation</label>
-                <div class="input-wrap has-suffix">
-                  <input id="opexEsc" type="number" min="0" max="100" step="0.1" value="2" />
-                  <span class="suffix">%</span>
+                <label for="portfolioHours">Hours Mode</label>
+                <div class="input-wrap">
+                  <select id="portfolioHours">
+                    <option value="profile">Technology-based shape</option>
+                    <option value="flat">Flat 24h generation</option>
+                  </select>
                 </div>
               </div>
             </div>
           </fieldset>
 
           <fieldset>
-            <legend>Costs & Commercials</legend>
-            <div class="grid-2">
-              <div class="field">
-                <label for="capex">CAPEX</label>
-                <div class="input-wrap has-prefix has-suffix">
-                  <span class="prefix">€</span>
-                  <input id="capex" type="number" min="0" step="1000" value="900000" />
-                  <span class="suffix">/MW</span>
-                </div>
-              </div>
-              <div class="field">
-                <label for="opex">Annual OPEX</label>
-                <div class="input-wrap has-prefix has-suffix">
-                  <span class="prefix">€</span>
-                  <input id="opex" type="number" min="0" step="100" value="18000" />
-                  <span class="suffix">/MW</span>
-                </div>
-              </div>
-              <div class="field">
-                <label for="fixedPrice">Fixed Price</label>
-                <div class="input-wrap has-prefix has-suffix">
-                  <span class="prefix">€</span>
-                  <input id="fixedPrice" type="number" min="0" step="0.1" value="85" />
-                  <span class="suffix">/MWh</span>
-                </div>
-              </div>
-              <div class="field">
-                <label for="fixedShare">Fixed Share</label>
-                <div class="input-wrap has-suffix">
-                  <input id="fixedShare" type="number" min="0" max="100" step="0.1" value="60" />
-                  <span class="suffix">%</span>
-                </div>
-              </div>
-              <div class="field">
-                <label for="price">Merchant Price</label>
-                <div class="input-wrap has-prefix has-suffix">
-                  <span class="prefix">€</span>
-                  <input id="price" type="number" min="0" step="0.1" value="90" />
-                  <span class="suffix">/MWh</span>
-                </div>
-              </div>
-              <div class="field">
-                <label for="priceEsc">Merchant Price Escalation</label>
-                <div class="input-wrap has-suffix">
-                  <input id="priceEsc" type="number" min="-100" max="100" step="0.1" value="1" />
-                  <span class="suffix">%</span>
-                </div>
-              </div>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Financing</legend>
-            <div class="grid-2">
-              <div class="field">
-                <label for="debtPct">Debt Share</label>
-                <div class="input-wrap has-suffix">
-                  <input id="debtPct" type="number" min="0" max="100" step="0.1" value="70" />
-                  <span class="suffix">%</span>
-                </div>
-              </div>
-              <div class="field">
-                <label for="tenor">Debt Tenor</label>
-                <div class="input-wrap has-suffix">
-                  <input id="tenor" type="number" min="1" step="1" value="15" />
-                  <span class="suffix">yrs</span>
-                </div>
-              </div>
-              <div class="field">
-                <label for="costDebt">Cost of Debt</label>
-                <div class="input-wrap has-suffix">
-                  <input id="costDebt" type="number" min="0" max="100" step="0.1" value="4" />
-                  <span class="suffix">%</span>
-                </div>
-              </div>
-              <div class="field">
-                <label for="costEq">Cost of Equity / Discount Rate</label>
-                <div class="input-wrap has-suffix">
-                  <input id="costEq" type="number" min="0" max="100" step="0.1" value="10" />
-                  <span class="suffix">%</span>
-                </div>
-              </div>
+            <legend>Assets</legend>
+            <div class="portfolio-list" id="assetList"></div>
+            <div class="actions">
+              <button class="ghost" id="addAssetBtn" type="button">+ Add Asset</button>
+              <button class="secondary" id="loadExampleBtn" type="button">Load Example Portfolio</button>
             </div>
           </fieldset>
 
           <div class="actions">
-            <button class="primary" id="calcBtn" type="button">Calculate Model</button>
-            <button class="secondary" id="exampleBtn" type="button">Load Example</button>
+            <button class="primary" id="calcBtn" type="button">Run Price Sensitivity</button>
           </div>
         </div>
+
         <div class="error" id="errorBox"></div>
       </aside>
 
       <section class="right-col">
         <div class="panel summary">
-          <div class="kpi-grid-top">
-            <div class="hero-card">
-              <div class="label">Equity IRR</div>
-              <div class="value" id="irr">—</div>
-              <div class="note" id="summaryNote">Based on simplified annual equity cash flows after OPEX and debt service.</div>
+          <div class="kpi-main">
+            <div class="big-card">
+              <div class="label">Base Annual Portfolio Revenue</div>
+              <div class="value" id="baseRevenueValue">—</div>
+              <div class="note" id="summaryNote">
+                Revenue combines fixed-price contracted revenue and merchant revenue exposed to hourly prices.
+              </div>
             </div>
-            <div class="mini-stack">
+            <div class="mini-grid">
               <div class="mini-card">
-                <div class="label">Equity NPV</div>
-                <div class="value" id="npv">—</div>
+                <div class="label">Portfolio Merchant Exposure</div>
+                <div class="value" id="merchantExposureValue">—</div>
               </div>
               <div class="mini-card">
-                <div class="label">Minimum DSCR</div>
-                <div class="value" id="dscr">—</div>
+                <div class="label">Revenue Sensitivity Band</div>
+                <div class="value" id="bandValue">—</div>
               </div>
             </div>
           </div>
 
           <div class="metrics">
             <div class="metric">
-              <div class="label">Total CAPEX</div>
-              <div class="num" id="totalCapex">—</div>
+              <div class="title">Portfolio Capacity</div>
+              <div class="num" id="capacityValue">—</div>
             </div>
             <div class="metric">
-              <div class="label">Base Revenue Y1</div>
-              <div class="num" id="rev1">—</div>
+              <div class="title">Annual Generation</div>
+              <div class="num" id="generationValue">—</div>
             </div>
             <div class="metric">
-              <div class="label">Equity Invested</div>
-              <div class="num" id="equity">—</div>
+              <div class="title">Fixed Revenue Share</div>
+              <div class="num" id="fixedShareValue">—</div>
             </div>
             <div class="metric">
-              <div class="label">Debt Raised</div>
-              <div class="num" id="debt">—</div>
+              <div class="title">Average Capture Price</div>
+              <div class="num" id="capturePriceValue">—</div>
             </div>
           </div>
         </div>
@@ -629,292 +520,392 @@
         <div class="panel chart-card">
           <div class="chart-head">
             <div>
-              <h3>IRR Price Sensitivity</h3>
-              <p>IRR under merchant price downside, base and upside scenarios. The sensitivity shocks the merchant price by -10%, 0% and +10%.</p>
+              <h3>24-Hour Revenue Sensitivity</h3>
+              <p>The blue line shows the reference hourly market price. The bars show portfolio hourly merchant revenue under low, base and high price scenarios.</p>
             </div>
             <div class="badge" id="chartBadge">No calculation yet</div>
           </div>
-          <canvas id="sensChart" width="980" height="320"></canvas>
+          <canvas id="hourlyChart" width="1000" height="330"></canvas>
         </div>
 
         <div class="panel">
-          <div class="panel-head">
-            <h2>Price Sensitivity Table</h2>
-            <p>Useful for quick valuation screening and commercial downside checks.</p>
+          <div class="panel-header">
+            <h2>Scenario Summary</h2>
+            <p>Low and high cases apply a parallel shock to the full 24-hour price curve. Fixed contracted revenue stays unchanged.</p>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
                   <th>Scenario</th>
-                  <th>Merchant Price</th>
-                  <th>IRR</th>
+                  <th>Price Multiplier</th>
+                  <th>Avg Market Price</th>
+                  <th>Merchant Revenue</th>
+                  <th>Fixed Revenue</th>
+                  <th>Total Revenue</th>
                   <th>Δ vs Base</th>
+                  <th>Δ % vs Base</th>
                 </tr>
               </thead>
-              <tbody id="sens"></tbody>
+              <tbody id="scenarioBody"></tbody>
             </table>
+          </div>
+          <div class="footnote">
+            Method: this dashboard creates a simple 24-hour reference price curve around the input reference price, then applies a symmetrical price sensitivity of ± the selected range.
+            For each asset, annual energy is distributed across the 24 hours using a simplified technology shape. Fixed-price percentages are priced at the entered fixed level, while the remaining merchant share is exposed to hourly prices.
           </div>
         </div>
 
         <div class="panel">
-          <div class="panel-head">
-            <h2>Annual Cash Flow Schedule</h2>
-            <p>Annual generation, revenue, OPEX, debt service, equity cash flow and period DSCR.</p>
+          <div class="panel-header">
+            <h2>Portfolio Asset Breakdown</h2>
+            <p>Annual asset-level generation and revenue split between fixed and merchant structures.</p>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Year</th>
-                  <th>Net Energy</th>
-                  <th>Revenue</th>
-                  <th>OPEX</th>
-                  <th>Debt Service</th>
-                  <th>CFADS</th>
-                  <th>Equity CF</th>
-                  <th>DSCR</th>
+                  <th>Asset</th>
+                  <th>Technology</th>
+                  <th>MW</th>
+                  <th>Yield</th>
+                  <th>Annual Generation</th>
+                  <th>Fixed %</th>
+                  <th>Fixed Price</th>
+                  <th>Merchant Share</th>
+                  <th>Base Revenue</th>
                 </tr>
               </thead>
-              <tbody id="cf"></tbody>
+              <tbody id="assetBreakdownBody"></tbody>
             </table>
-          </div>
-          <div class="footnote">
-            Simplifications used: annual model, straight-line principal amortization, yearly interest on opening debt balance, no taxes, no reserve accounts, no grace period, and no sculpting.
           </div>
         </div>
       </section>
     </div>
   </div>
 
+  <template id="assetTemplate">
+    <div class="asset-card">
+      <div class="asset-head">
+        <div>
+          <div class="asset-title">Asset <span class="asset-index"></span></div>
+          <div class="asset-meta">Technology, size, yield and commercial structure</div>
+        </div>
+        <button class="remove-btn" type="button">Remove</button>
+      </div>
+      <div class="asset-grid">
+        <div class="field">
+          <label>Asset Name</label>
+          <input class="asset-name" type="text" maxlength="30" placeholder="e.g. Solar South" />
+        </div>
+        <div class="field">
+          <label>Technology</label>
+          <select class="asset-tech">
+            <option value="solar">Solar</option>
+            <option value="wind">Wind</option>
+            <option value="gas">Gas</option>
+            <option value="battery">Battery</option>
+            <option value="hydro">Hydro</option>
+            <option value="biomass">Biomass</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>MW</label>
+          <div class="input-wrap has-suffix">
+            <input class="asset-mw" type="number" min="0" step="0.1" value="50" />
+            <span class="suffix">MW</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Yield</label>
+          <div class="input-wrap has-suffix">
+            <input class="asset-yield" type="number" min="0" step="1" value="1400" />
+            <span class="suffix">MWh/MW</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Fixed Price Share</label>
+          <div class="input-wrap has-suffix">
+            <input class="asset-fixed-share" type="number" min="0" max="100" step="0.1" value="60" />
+            <span class="suffix">%</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Fixed Price Level</label>
+          <div class="input-wrap has-prefix has-suffix">
+            <span class="prefix">€</span>
+            <input class="asset-fixed-price" type="number" min="0" step="0.1" value="85" />
+            <span class="suffix">/MWh</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
   <script>
+    const MAX_ASSETS = 10;
     const $ = (id) => document.getElementById(id);
 
     const fields = {
-      life: $('life'),
-      mw: $('mw'),
-      yield: $('yield'),
-      deg: $('deg'),
-      curt: $('curt'),
-      opexEsc: $('opexEsc'),
-      capex: $('capex'),
-      opex: $('opex'),
-      fixedPrice: $('fixedPrice'),
-      fixedShare: $('fixedShare'),
-      price: $('price'),
-      priceEsc: $('priceEsc'),
-      debtPct: $('debtPct'),
-      tenor: $('tenor'),
-      costDebt: $('costDebt'),
-      costEq: $('costEq')
+      referencePrice: $('referencePrice'),
+      priceRange: $('priceRange'),
+      portfolioHours: $('portfolioHours')
     };
 
-    const example = {
-      life: 25,
-      mw: 50,
-      yield: 1400,
-      deg: 0.5,
-      curt: 3,
-      opexEsc: 2,
-      capex: 900000,
-      opex: 18000,
-      fixedPrice: 85,
-      fixedShare: 60,
-      price: 90,
-      priceEsc: 1,
-      debtPct: 70,
-      tenor: 15,
-      costDebt: 4,
-      costEq: 10
+    const assetList = $('assetList');
+    const assetTemplate = $('assetTemplate');
+
+    const profileLibrary = {
+      solar: [0,0,0,0,0,0.01,0.04,0.08,0.12,0.15,0.16,0.16,0.14,0.10,0.03,0.01,0,0,0,0,0,0,0,0],
+      wind:  [0.040,0.042,0.043,0.044,0.046,0.045,0.044,0.042,0.040,0.038,0.036,0.035,0.034,0.035,0.037,0.039,0.042,0.045,0.047,0.048,0.047,0.045,0.043,0.041],
+      gas:   Array(24).fill(1/24),
+      battery:[0.00,0.00,0.00,0.00,0.00,0.01,0.02,0.04,0.05,0.03,0.02,0.01,0.01,0.02,0.04,0.08,0.12,0.14,0.15,0.12,0.08,0.03,0.01,0.00],
+      hydro: [0.041,0.041,0.041,0.041,0.041,0.041,0.041,0.042,0.042,0.042,0.042,0.042,0.042,0.042,0.042,0.042,0.042,0.042,0.041,0.041,0.041,0.041,0.041,0.041],
+      biomass:[0.041,0.041,0.041,0.041,0.041,0.041,0.041,0.042,0.042,0.042,0.042,0.042,0.042,0.042,0.042,0.042,0.042,0.042,0.041,0.041,0.041,0.041,0.041,0.041]
     };
 
-    function fmtNum(v, d = 0) {
-      return new Intl.NumberFormat('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }).format(v);
+    function normalize(arr) {
+      const sum = arr.reduce((a,b) => a+b, 0) || 1;
+      return arr.map(v => v / sum);
     }
 
-    function fmtCur(v, d = 0) {
-      return `EUR ${fmtNum(v, d)}`;
+    Object.keys(profileLibrary).forEach(k => profileLibrary[k] = normalize(profileLibrary[k]));
+
+    function flatProfile() {
+      return Array(24).fill(1/24);
     }
 
-    function fmtPct(v, d = 1) {
-      return `${fmtNum(v, d)}%`;
+    function priceShape(base) {
+      const multipliers = [0.72,0.68,0.65,0.64,0.66,0.74,0.86,0.98,1.03,1.00,0.94,0.90,0.88,0.89,0.93,1.02,1.12,1.22,1.28,1.24,1.12,1.00,0.88,0.79];
+      return multipliers.map(m => base * m);
     }
 
-    function clsBySign(v) {
-      if (v > 0.000001) return 'positive';
-      if (v < -0.000001) return 'negative';
+    function formatNumber(value, decimals = 0) {
+      return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }).format(value);
+    }
+
+    function formatCurrency(value, decimals = 0) {
+      return `EUR ${formatNumber(value, decimals)}`;
+    }
+
+    function formatPercent(value, decimals = 1) {
+      return `${formatNumber(value, decimals)}%`;
+    }
+
+    function classBySign(value) {
+      if (value > 0.000001) return 'positive';
+      if (value < -0.000001) return 'negative';
       return 'neutral';
     }
 
+    function signedCurrency(value) {
+      const sign = value > 0 ? '+' : '';
+      return sign + formatCurrency(value, 0);
+    }
+
+    function signedPercent(value) {
+      const sign = value > 0 ? '+' : '';
+      return sign + formatPercent(value, 2);
+    }
+
+    function addAsset(asset = {}) {
+      if (assetList.children.length >= MAX_ASSETS) return;
+      const node = assetTemplate.content.firstElementChild.cloneNode(true);
+      node.querySelector('.asset-name').value = asset.name || `Asset ${assetList.children.length + 1}`;
+      node.querySelector('.asset-tech').value = asset.tech || 'solar';
+      node.querySelector('.asset-mw').value = asset.mw ?? 50;
+      node.querySelector('.asset-yield').value = asset.yield ?? 1400;
+      node.querySelector('.asset-fixed-share').value = asset.fixedShare ?? 60;
+      node.querySelector('.asset-fixed-price').value = asset.fixedPrice ?? 85;
+      node.querySelector('.remove-btn').addEventListener('click', () => {
+        node.remove();
+        refreshAssetIndexes();
+      });
+      assetList.appendChild(node);
+      refreshAssetIndexes();
+    }
+
+    function refreshAssetIndexes() {
+      [...assetList.children].forEach((node, idx) => {
+        node.querySelector('.asset-index').textContent = idx + 1;
+      });
+      $('addAssetBtn').disabled = assetList.children.length >= MAX_ASSETS;
+      $('addAssetBtn').style.opacity = assetList.children.length >= MAX_ASSETS ? '0.55' : '1';
+      $('addAssetBtn').style.cursor = assetList.children.length >= MAX_ASSETS ? 'not-allowed' : 'pointer';
+    }
+
+    function loadExamplePortfolio() {
+      assetList.innerHTML = '';
+      [
+        { name: 'Solar South', tech: 'solar', mw: 80, yield: 1550, fixedShare: 65, fixedPrice: 82 },
+        { name: 'Wind North', tech: 'wind', mw: 120, yield: 2800, fixedShare: 40, fixedPrice: 78 },
+        { name: 'Gas Peaker', tech: 'gas', mw: 60, yield: 4200, fixedShare: 20, fixedPrice: 110 },
+        { name: 'Hydro East', tech: 'hydro', mw: 35, yield: 3100, fixedShare: 55, fixedPrice: 88 }
+      ].forEach(addAsset);
+      fields.referencePrice.value = 90;
+      fields.priceRange.value = 10;
+      fields.portfolioHours.value = 'profile';
+    }
+
+    function readAssets() {
+      return [...assetList.children].map((node, idx) => ({
+        name: (node.querySelector('.asset-name').value || `Asset ${idx + 1}`).trim(),
+        tech: node.querySelector('.asset-tech').value,
+        mw: Number(node.querySelector('.asset-mw').value),
+        yield: Number(node.querySelector('.asset-yield').value),
+        fixedShare: Number(node.querySelector('.asset-fixed-share').value),
+        fixedPrice: Number(node.querySelector('.asset-fixed-price').value)
+      }));
+    }
+
     function readInputs() {
-      const obj = {};
-      for (const [k, el] of Object.entries(fields)) obj[k] = Number(el.value);
-      return obj;
-    }
-
-    function validate(v) {
-      const errors = [];
-      if (v.life < 1) errors.push('Project life must be at least 1 year.');
-      if (v.mw <= 0) errors.push('Capacity must be greater than zero.');
-      if (v.yield <= 0) errors.push('Yield must be greater than zero.');
-      if (v.deg < 0 || v.deg >= 100) errors.push('Degradation must be between 0% and 100% (excluded).');
-      if (v.curt < 0 || v.curt >= 100) errors.push('Curtailment must be between 0% and 100% (excluded).');
-      if (v.fixedShare < 0 || v.fixedShare > 100) errors.push('Fixed share must be between 0% and 100%.');
-      if (v.debtPct < 0 || v.debtPct > 100) errors.push('Debt share must be between 0% and 100%.');
-      if (v.tenor < 1) errors.push('Debt tenor must be at least 1 year.');
-      if (v.tenor > v.life) errors.push('Debt tenor cannot exceed project life.');
-      if (v.costDebt < 0 || v.costEq < 0) errors.push('Debt cost and equity discount rate must be zero or greater.');
-      if (v.capex < 0 || v.opex < 0 || v.fixedPrice < 0 || v.price < 0) errors.push('CAPEX, OPEX and prices must be zero or greater.');
-      return errors;
-    }
-
-    function npv(rate, cashflows) {
-      return cashflows.reduce((acc, cf, i) => acc + cf / Math.pow(1 + rate, i), 0);
-    }
-
-    function irr(cashflows) {
-      let low = -0.99;
-      let high = 3.0;
-      let fLow = npv(low, cashflows);
-      let fHigh = npv(high, cashflows);
-      let guard = 0;
-      while (fLow * fHigh > 0 && guard < 40) {
-        high += 2;
-        fHigh = npv(high, cashflows);
-        guard++;
-      }
-      if (fLow * fHigh > 0) return null;
-      for (let i = 0; i < 120; i++) {
-        const mid = (low + high) / 2;
-        const fMid = npv(mid, cashflows);
-        if (Math.abs(fMid) < 1e-8) return mid;
-        if (fLow * fMid < 0) {
-          high = mid;
-          fHigh = fMid;
-        } else {
-          low = mid;
-          fLow = fMid;
-        }
-      }
-      return (low + high) / 2;
-    }
-
-    function buildModel(v, merchantPriceMultiplier = 1) {
-      const deg = v.deg / 100;
-      const curt = v.curt / 100;
-      const fixedShare = v.fixedShare / 100;
-      const debtShare = v.debtPct / 100;
-      const costDebt = v.costDebt / 100;
-      const discEq = v.costEq / 100;
-      const opexEsc = v.opexEsc / 100;
-      const priceEsc = v.priceEsc / 100;
-
-      const totalCapex = v.capex * v.mw;
-      const debt = totalCapex * debtShare;
-      const equity = totalCapex - debt;
-      const annualPrincipal = v.tenor > 0 ? debt / v.tenor : 0;
-
-      let outstanding = debt;
-      let minDSCR = Infinity;
-      let year1Revenue = 0;
-      const rows = [];
-      const eqCashflows = [-equity];
-
-      for (let year = 1; year <= v.life; year++) {
-        const grossEnergy = v.yield * v.mw * Math.pow(1 - deg, year - 1);
-        const netEnergy = grossEnergy * (1 - curt);
-        const merchantPrice = v.price * merchantPriceMultiplier * Math.pow(1 + priceEsc, year - 1);
-        const blendedPrice = fixedShare * v.fixedPrice + (1 - fixedShare) * merchantPrice;
-        const revenue = netEnergy * blendedPrice;
-        const opex = v.opex * v.mw * Math.pow(1 + opexEsc, year - 1);
-        const interest = year <= v.tenor ? outstanding * costDebt : 0;
-        const principal = year <= v.tenor ? Math.min(annualPrincipal, outstanding) : 0;
-        const debtService = interest + principal;
-        const cfads = revenue - opex;
-        const equityCF = cfads - debtService;
-        const dscr = debtService > 0 ? cfads / debtService : null;
-
-        if (year === 1) year1Revenue = revenue;
-        if (dscr !== null) minDSCR = Math.min(minDSCR, dscr);
-
-        rows.push({ year, netEnergy, revenue, opex, debtService, cfads, equityCF, dscr });
-        eqCashflows.push(equityCF);
-        outstanding = Math.max(0, outstanding - principal);
-      }
-
       return {
-        totalCapex,
-        debt,
-        equity,
-        year1Revenue,
-        minDSCR: Number.isFinite(minDSCR) ? minDSCR : null,
-        eqCashflows,
-        eqIRR: irr(eqCashflows),
-        eqNPV: npv(discEq, eqCashflows),
-        rows
+        referencePrice: Number(fields.referencePrice.value),
+        priceRange: Number(fields.priceRange.value),
+        portfolioHours: fields.portfolioHours.value,
+        assets: readAssets()
       };
     }
 
-    function renderSummary(v, model) {
-      $('irr').textContent = model.eqIRR === null ? 'n.a.' : fmtPct(model.eqIRR * 100, 1);
-      $('npv').textContent = fmtCur(model.eqNPV, 0);
-      $('dscr').textContent = model.minDSCR === null ? 'n.a.' : fmtNum(model.minDSCR, 2) + 'x';
-      $('totalCapex').textContent = fmtCur(model.totalCapex, 0);
-      $('rev1').textContent = fmtCur(model.year1Revenue, 0);
-      $('equity').textContent = fmtCur(model.equity, 0);
-      $('debt').textContent = fmtCur(model.debt, 0);
-      $('summaryNote').textContent = `Base-case model assumes ${fmtPct(v.fixedShare, 1)} fixed-price revenue at EUR ${fmtNum(v.fixedPrice, 2)}/MWh and merchant price starting at EUR ${fmtNum(v.price, 2)}/MWh.`;
-      $('chartBadge').textContent = model.eqIRR === null ? 'IRR unavailable' : `Base IRR ${fmtPct(model.eqIRR * 100, 1)}`;
+    function validate(input) {
+      const errors = [];
+      if (input.referencePrice < 0) errors.push('Reference price must be zero or greater.');
+      if (input.priceRange < 0 || input.priceRange > 100) errors.push('Sensitivity range must be between 0% and 100%.');
+      if (input.assets.length === 0) errors.push('Add at least one asset.');
+      if (input.assets.length > MAX_ASSETS) errors.push('Portfolio can include up to 10 assets.');
+
+      input.assets.forEach((a, i) => {
+        if (!a.name) errors.push(`Asset ${i + 1}: name is required.`);
+        if (a.mw <= 0) errors.push(`${a.name || `Asset ${i + 1}`}: MW must be greater than zero.`);
+        if (a.yield <= 0) errors.push(`${a.name || `Asset ${i + 1}`}: yield must be greater than zero.`);
+        if (a.fixedShare < 0 || a.fixedShare > 100) errors.push(`${a.name || `Asset ${i + 1}`}: fixed price share must be between 0% and 100%.`);
+        if (a.fixedPrice < 0) errors.push(`${a.name || `Asset ${i + 1}`}: fixed price level must be zero or greater.`);
+      });
+      return errors;
     }
 
-    function renderCashflowTable(model) {
-      $('cf').innerHTML = model.rows.map(r => `
-        <tr>
-          <td>${r.year}</td>
-          <td>${fmtNum(r.netEnergy, 0)} MWh</td>
-          <td>${fmtCur(r.revenue, 0)}</td>
-          <td>${fmtCur(r.opex, 0)}</td>
-          <td>${fmtCur(r.debtService, 0)}</td>
-          <td>${fmtCur(r.cfads, 0)}</td>
-          <td class="${clsBySign(r.equityCF)}">${fmtCur(r.equityCF, 0)}</td>
-          <td>${r.dscr === null ? '—' : fmtNum(r.dscr, 2) + 'x'}</td>
-        </tr>
-      `).join('');
+    function getGenerationProfile(tech, mode) {
+      if (mode === 'flat') return flatProfile();
+      return profileLibrary[tech] || flatProfile();
     }
 
-    function renderSensitivity(v, baseModel) {
+    function calculatePortfolio(input) {
+      const basePrices = priceShape(input.referencePrice);
+      const lowPrices = basePrices.map(p => p * (1 - input.priceRange / 100));
+      const highPrices = basePrices.map(p => p * (1 + input.priceRange / 100));
       const scenarios = [
-        { name: 'Low', mult: 0.90 },
-        { name: 'Base', mult: 1.00 },
-        { name: 'High', mult: 1.10 }
-      ].map(s => {
-        const model = buildModel(v, s.mult);
+        { name: 'Low', multiplier: 1 - input.priceRange / 100, prices: lowPrices },
+        { name: 'Base', multiplier: 1, prices: basePrices },
+        { name: 'High', multiplier: 1 + input.priceRange / 100, prices: highPrices }
+      ];
+
+      const assetResults = input.assets.map(asset => {
+        const annualGeneration = asset.mw * asset.yield;
+        const fixedShare = asset.fixedShare / 100;
+        const merchantShare = 1 - fixedShare;
+        const fixedRevenue = annualGeneration * fixedShare * asset.fixedPrice;
+        const profile = getGenerationProfile(asset.tech, input.portfolioHours);
+        const hourlyGeneration = profile.map(w => annualGeneration * merchantShare * w);
+        const avgCapturePriceBase = hourlyGeneration.reduce((sum, gen, h) => sum + gen * basePrices[h], 0) / (hourlyGeneration.reduce((a,b)=>a+b,0) || 1);
+
+        const merchantByScenario = scenarios.map(s => hourlyGeneration.reduce((sum, gen, h) => sum + gen * s.prices[h], 0));
+        const totalByScenario = merchantByScenario.map(m => m + fixedRevenue);
+
         return {
-          ...s,
-          price: v.price * s.mult,
-          irr: model.eqIRR,
-          delta: baseModel.eqIRR === null || model.eqIRR === null ? null : (model.eqIRR - baseModel.eqIRR)
+          ...asset,
+          annualGeneration,
+          fixedRevenue,
+          merchantShare,
+          hourlyGeneration,
+          avgCapturePriceBase,
+          merchantByScenario,
+          totalByScenario
         };
       });
 
-      $('sens').innerHTML = scenarios.map(s => `
-        <tr>
-          <td>${s.name}</td>
-          <td>${fmtCur(s.price, 2)}/MWh</td>
-          <td>${s.irr === null ? 'n.a.' : fmtPct(s.irr * 100, 1)}</td>
-          <td class="${s.delta === null ? 'neutral' : clsBySign(s.delta)}">${s.delta === null ? '—' : (s.delta > 0 ? '+' : '') + fmtPct(s.delta * 100, 1)}</td>
-        </tr>
-      `).join('');
+      const totals = {
+        totalMw: assetResults.reduce((s,a) => s + a.mw, 0),
+        annualGeneration: assetResults.reduce((s,a) => s + a.annualGeneration, 0),
+        fixedRevenue: assetResults.reduce((s,a) => s + a.fixedRevenue, 0),
+        merchantRevenueByScenario: scenarios.map((_,i) => assetResults.reduce((s,a) => s + a.merchantByScenario[i], 0)),
+        totalRevenueByScenario: scenarios.map((_,i) => assetResults.reduce((s,a) => s + a.totalByScenario[i], 0)),
+        hourlyMerchantRevenue: scenarios.map((scenario, i) => Array.from({ length: 24 }, (_, h) => assetResults.reduce((s,a) => s + a.hourlyGeneration[h] * scenario.prices[h], 0))),
+      };
 
-      renderChart(scenarios);
+      totals.fixedRevenueShare = totals.totalRevenueByScenario[1] === 0 ? 0 : totals.fixedRevenue / totals.totalRevenueByScenario[1];
+      totals.merchantExposureShare = 1 - totals.fixedRevenueShare;
+      const baseMerchantMWh = assetResults.reduce((s,a) => s + a.annualGeneration * a.merchantShare, 0);
+      totals.avgCapturePriceBase = baseMerchantMWh === 0 ? 0 : totals.merchantRevenueByScenario[1] / baseMerchantMWh;
+
+      return { scenarios, assetResults, totals };
     }
 
-    function renderChart(scenarios) {
-      const canvas = $('sensChart');
+    function renderSummary(input, result) {
+      const baseRevenue = result.totals.totalRevenueByScenario[1];
+      const lowRevenue = result.totals.totalRevenueByScenario[0];
+      const highRevenue = result.totals.totalRevenueByScenario[2];
+      $('baseRevenueValue').textContent = formatCurrency(baseRevenue, 0);
+      $('merchantExposureValue').textContent = formatPercent(result.totals.merchantExposureShare * 100, 1);
+      $('bandValue').textContent = `${formatCurrency(lowRevenue, 0)} → ${formatCurrency(highRevenue, 0)}`;
+      $('capacityValue').textContent = `${formatNumber(result.totals.totalMw, 1)} MW`;
+      $('generationValue').textContent = `${formatNumber(result.totals.annualGeneration, 0)} MWh`;
+      $('fixedShareValue').textContent = formatPercent(result.totals.fixedRevenueShare * 100, 1);
+      $('capturePriceValue').textContent = `${formatCurrency(result.totals.avgCapturePriceBase, 2)}/MWh`;
+      $('summaryNote').textContent = `Base revenue assumes a reference power price of ${formatCurrency(input.referencePrice, 2)}/MWh and a ${formatPercent(input.priceRange, 1)} parallel shock range on the full 24-hour market curve.`;
+      $('chartBadge').textContent = `Base revenue: ${formatCurrency(baseRevenue, 0)}`;
+    }
+
+    function renderScenarioTable(result) {
+      const body = $('scenarioBody');
+      const baseRevenue = result.totals.totalRevenueByScenario[1];
+      body.innerHTML = result.scenarios.map((s, i) => {
+        const avgMarket = s.prices.reduce((a,b) => a + b, 0) / s.prices.length;
+        const merchantRevenue = result.totals.merchantRevenueByScenario[i];
+        const fixedRevenue = result.totals.fixedRevenue;
+        const totalRevenue = result.totals.totalRevenueByScenario[i];
+        const delta = totalRevenue - baseRevenue;
+        const deltaPct = baseRevenue === 0 ? 0 : (delta / baseRevenue) * 100;
+        return `
+          <tr>
+            <td>${s.name}</td>
+            <td>${formatNumber(s.multiplier, 2)}x</td>
+            <td>${formatCurrency(avgMarket, 2)}/MWh</td>
+            <td>${formatCurrency(merchantRevenue, 0)}</td>
+            <td>${formatCurrency(fixedRevenue, 0)}</td>
+            <td>${formatCurrency(totalRevenue, 0)}</td>
+            <td class="${classBySign(delta)}">${signedCurrency(delta)}</td>
+            <td class="${classBySign(deltaPct)}">${signedPercent(deltaPct)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderAssetBreakdown(result) {
+      const body = $('assetBreakdownBody');
+      body.innerHTML = result.assetResults.map(asset => `
+        <tr>
+          <td>${asset.name}</td>
+          <td style="text-transform: capitalize;">${asset.tech}</td>
+          <td>${formatNumber(asset.mw, 1)}</td>
+          <td>${formatNumber(asset.yield, 0)} MWh/MW</td>
+          <td>${formatNumber(asset.annualGeneration, 0)} MWh</td>
+          <td>${formatPercent(asset.fixedShare, 1)}</td>
+          <td>${formatCurrency(asset.fixedPrice, 2)}/MWh</td>
+          <td>${formatPercent(asset.merchantShare * 100, 1)}</td>
+          <td>${formatCurrency(asset.totalByScenario[1], 0)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderChart(result) {
+      const canvas = $('hourlyChart');
       const ctx = canvas.getContext('2d');
       const dpr = window.devicePixelRatio || 1;
-      const cssWidth = canvas.clientWidth || 980;
-      const cssHeight = 320;
+      const cssWidth = canvas.clientWidth || 1000;
+      const cssHeight = 330;
       canvas.width = cssWidth * dpr;
       canvas.height = cssHeight * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -923,103 +914,133 @@
       const height = cssHeight;
       ctx.clearRect(0, 0, width, height);
 
-      const values = scenarios.map(s => s.irr === null ? 0 : s.irr * 100);
-      const maxVal = Math.max(...values, 1) * 1.18;
-      const margin = { top: 24, right: 20, bottom: 40, left: 56 };
+      const margin = { top: 24, right: 20, bottom: 38, left: 64 };
       const plotW = width - margin.left - margin.right;
       const plotH = height - margin.top - margin.bottom;
-      const step = plotW / scenarios.length;
-      const barW = Math.min(120, step * 0.58);
+      const basePrices = result.scenarios[1].prices;
+      const lowRevenues = result.totals.hourlyMerchantRevenue[0];
+      const baseRevenues = result.totals.hourlyMerchantRevenue[1];
+      const highRevenues = result.totals.hourlyMerchantRevenue[2];
+      const maxRevenue = Math.max(...highRevenues, ...baseRevenues, ...lowRevenues, 1);
+      const maxPrice = Math.max(...basePrices, 1);
+      const stepX = plotW / 24;
+      const groupW = Math.min(24, stepX * 0.8);
+      const barW = groupW / 3;
 
       for (let i = 0; i <= 4; i++) {
         const y = margin.top + (plotH / 4) * i;
         ctx.beginPath();
         ctx.moveTo(margin.left, y);
         ctx.lineTo(width - margin.right, y);
-        ctx.strokeStyle = 'rgba(148,163,184,0.18)';
+        ctx.strokeStyle = 'rgba(0,0,0,0.08)';
         ctx.lineWidth = 1;
         ctx.stroke();
-        const label = maxVal * (1 - i / 4);
+        const label = maxRevenue * (1 - i / 4);
         ctx.fillStyle = '#64748b';
         ctx.font = '12px Inter, sans-serif';
         ctx.textAlign = 'right';
-        ctx.fillText(fmtNum(label, 0) + '%', margin.left - 8, y + 4);
+        ctx.fillText(formatNumber(label, 0), margin.left - 8, y + 4);
       }
 
-      scenarios.forEach((s, i) => {
-        const val = s.irr === null ? 0 : s.irr * 100;
-        const x = margin.left + step * i + step / 2;
-        const h = (val / maxVal) * plotH;
-        const y = margin.top + plotH - h;
-        const grad = ctx.createLinearGradient(0, y, 0, margin.top + plotH);
-        grad.addColorStop(0, i === 1 ? '#2563eb' : (i === 0 ? '#94a3b8' : '#06b6d4'));
-        grad.addColorStop(1, i === 1 ? 'rgba(37,99,235,0.18)' : 'rgba(6,182,212,0.10)');
-        ctx.fillStyle = grad;
-        const rx = x - barW / 2;
-        roundRect(ctx, rx, y, barW, h, 18, true, false);
-
-        ctx.fillStyle = '#0f172a';
-        ctx.font = '700 13px Inter, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(s.name, x, height - 14);
-        ctx.font = '800 14px Inter, sans-serif';
-        ctx.fillText(s.irr === null ? 'n.a.' : fmtNum(val, 1) + '%', x, y - 10);
-      });
-    }
-
-    function roundRect(ctx, x, y, w, h, r, fill, stroke) {
-      if (w < 2 * r) r = w / 2;
-      if (h < 2 * r) r = h / 2;
       ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.arcTo(x + w, y, x + w, y + h, r);
-      ctx.arcTo(x + w, y + h, x, y + h, r);
-      ctx.arcTo(x, y + h, x, y, r);
-      ctx.arcTo(x, y, x + w, y, r);
-      ctx.closePath();
-      if (fill) ctx.fill();
-      if (stroke) ctx.stroke();
+      ctx.moveTo(margin.left, margin.top);
+      ctx.lineTo(margin.left, margin.top + plotH);
+      ctx.lineTo(margin.left + plotW, margin.top + plotH);
+      ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+      ctx.stroke();
+
+      for (let h = 0; h < 24; h++) {
+        const x0 = margin.left + stepX * h + (stepX - groupW) / 2;
+        const values = [lowRevenues[h], baseRevenues[h], highRevenues[h]];
+        const colors = ['rgba(14,165,233,0.22)', 'rgba(37,99,235,0.38)', 'rgba(22,163,74,0.32)'];
+        values.forEach((v, idx) => {
+          const barHpx = (v / maxRevenue) * plotH;
+          ctx.fillStyle = colors[idx];
+          ctx.fillRect(x0 + barW * idx, margin.top + plotH - barHpx, barW - 1, barHpx);
+        });
+
+        if (h < 23) {
+          ctx.fillStyle = '#64748b';
+          ctx.font = '11px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(String(h), margin.left + stepX * h + stepX / 2, height - 10);
+        }
+      }
+
+      ctx.beginPath();
+      basePrices.forEach((p, h) => {
+        const x = margin.left + stepX * h + stepX / 2;
+        const y = margin.top + plotH - (p / maxPrice) * (plotH * 0.75);
+        if (h === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 2.2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#2563eb';
+      ctx.fillRect(margin.left, 10, 12, 12);
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '12px Inter, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('Base merchant revenue', margin.left + 18, 20);
+      ctx.fillStyle = 'rgba(22,163,74,0.5)';
+      ctx.fillRect(margin.left + 160, 10, 12, 12);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillText('High revenue', margin.left + 178, 20);
+      ctx.fillStyle = 'rgba(14,165,233,0.35)';
+      ctx.fillRect(margin.left + 265, 10, 12, 12);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillText('Low revenue', margin.left + 283, 20);
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(margin.left + 380, 16);
+      ctx.lineTo(margin.left + 394, 16);
+      ctx.stroke();
+      ctx.fillStyle = '#0f172a';
+      ctx.fillText('Reference hourly price', margin.left + 402, 20);
     }
 
-    function showError(msg) {
-      const el = $('errorBox');
-      if (msg) {
-        el.style.display = 'block';
-        el.textContent = msg;
+    function showError(message) {
+      const box = $('errorBox');
+      if (message) {
+        box.style.display = 'block';
+        box.textContent = message;
       } else {
-        el.style.display = 'none';
-        el.textContent = '';
+        box.style.display = 'none';
+        box.textContent = '';
       }
     }
 
-    function loadExample() {
-      Object.entries(example).forEach(([k, v]) => fields[k].value = v);
-      run();
-    }
-
-    function run() {
-      const v = readInputs();
-      const errors = validate(v);
+    function runCalculation() {
+      const input = readInputs();
+      const errors = validate(input);
       if (errors.length) {
         showError(errors.join(' '));
         return;
       }
       showError('');
-      const model = buildModel(v, 1);
-      renderSummary(v, model);
-      renderCashflowTable(model);
-      renderSensitivity(v, model);
+      const result = calculatePortfolio(input);
+      renderSummary(input, result);
+      renderScenarioTable(result);
+      renderAssetBreakdown(result);
+      renderChart(result);
     }
 
-    $('calcBtn').addEventListener('click', run);
-    $('exampleBtn').addEventListener('click', loadExample);
+    $('addAssetBtn').addEventListener('click', () => addAsset());
+    $('loadExampleBtn').addEventListener('click', () => {
+      loadExamplePortfolio();
+      runCalculation();
+    });
+    $('calcBtn').addEventListener('click', runCalculation);
     window.addEventListener('resize', () => {
-      const v = readInputs();
-      const errors = validate(v);
-      if (!errors.length) renderSensitivity(v, buildModel(v, 1));
+      const input = readInputs();
+      const errors = validate(input);
+      if (!errors.length) renderChart(calculatePortfolio(input));
     });
 
-    loadExample();
+    loadExamplePortfolio();
+    runCalculation();
   </script>
 </body>
 </html>
