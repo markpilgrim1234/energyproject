@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Battery Arbitrage Tool</title>
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --panel: rgba(255,255,255,0.78);
+      --panel-strong: rgba(255,255,255,0.94);
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent-2: #06b6d4;
+      --good: #16a34a;
+      --bad: #dc2626;
+      --border: rgba(148,163,184,0.22);
+      --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(6,182,212,0.10), transparent 22%),
+        linear-gradient(180deg, #f8fbff 0%, #f6f8fc 100%);
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: 1520px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(32px, 4.3vw, 52px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      max-width: 900px;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+      box-shadow: var(--shadow);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 430px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 22px 22px 14px;
+      border-bottom: 1px solid rgba(148,163,184,0.16);
+      background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.40));
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .inputs {
+      padding: 20px 22px 22px;
+      display: grid;
+      gap: 18px;
+    }
+
+    fieldset {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    legend {
+      padding: 0;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .prefix, .suffix {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 12px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .prefix { left: 12px; }
+    .suffix { right: 12px; }
+
+    input, select {
+      width: 100%;
+      border: 1px solid rgba(148,163,184,0.24);
+      background: rgba(255,255,255,0.92);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 13px 14px;
+      font-size: 14px;
+      outline: none;
+      transition: 0.18s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+      font-family: inherit;
+    }
+
+    input[type="range"] {
+      padding: 0;
+      box-shadow: none;
+      background: transparent;
+      border: 0;
+      accent-color: var(--accent);
+      min-height: 32px;
+    }
+
+    .has-prefix input { padding-left: 28px; }
+    .has-suffix input:not([type="range"]),
+    .has-suffix select { padding-right: 54px; }
+
+    input:focus, select:focus {
+      border-color: rgba(37,99,235,0.45);
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.10);
+      transform: translateY(-1px);
+    }
+
+    input[type="range"]:focus {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-top: 4px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 16px;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      box-shadow: 0 14px 28px rgba(37,99,235,0.20);
+    }
+
+    .secondary {
+      background: rgba(255,255,255,0.92);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .right-col {
+      display: grid;
+      gap: 24px;
+    }
+
+    .summary {
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .kpi-grid-top {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 16px;
+    }
+
+    .hero-card, .mini-stack, .metric {
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+    }
+
+    .hero-card {
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(37,99,235,0.92), rgba(6,182,212,0.88));
+      color: white;
+      border: 0;
+      box-shadow: 0 22px 40px rgba(37,99,235,0.22);
+    }
+
+    .hero-card .label,
+    .mini-card .label,
+    .metric .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.85;
+    }
+
+    .hero-card .value {
+      margin-top: 10px;
+      font-size: clamp(30px, 4vw, 48px);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 0.95;
+    }
+
+    .hero-card .note {
+      margin-top: 10px;
+      font-size: 14px;
+      line-height: 1.45;
+      max-width: 56ch;
+      color: rgba(255,255,255,0.88);
+    }
+
+    .mini-stack {
+      display: grid;
+      gap: 14px;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+
+    .mini-card {
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+    }
+
+    .mini-card .value {
+      margin-top: 10px;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .metric { padding: 16px; }
+    .metric .num {
+      margin-top: 8px;
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .chart-card { padding: 20px 22px 16px; }
+
+    .chart-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .chart-head h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .chart-head p {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+      max-width: 66ch;
+    }
+
+    canvas {
+      width: 100%;
+      height: 320px;
+      display: block;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(248,250,252,0.92));
+    }
+
+    .table-wrap { padding: 0 22px 22px; overflow: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 980px; }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: right;
+      border-bottom: 1px solid rgba(148,163,184,0.16);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    th:first-child, td:first-child { text-align: left; }
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(10px);
+    }
+
+    tbody tr:hover td { background: rgba(37,99,235,0.03); }
+    .positive { color: var(--good); font-weight: 800; }
+    .negative { color: var(--bad); font-weight: 800; }
+    .neutral { color: var(--muted); font-weight: 800; }
+
+    .pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(37,99,235,0.07);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid rgba(37,99,235,0.10);
+    }
+
+    .error {
+      display: none;
+      color: var(--bad);
+      font-size: 13px;
+      padding: 0 22px 20px;
+      font-weight: 700;
+    }
+
+    .footnote {
+      padding: 0 22px 22px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .debug-note {
+      display: none;
+    }
+
+    @media (max-width: 1220px) {
+      .layout { grid-template-columns: 1fr; }
+      .kpi-grid-top, .metrics { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .shell { padding: 16px; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .hero { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div>
+        <h1>Battery Arbitrage Tool</h1>
+        <p>
+          A simple dispatch optimizer for a battery energy storage system. Use sliders for the most impactful battery variables and generate a 24-hour price curve
+          from price-level and volatility presets. The tool estimates an economically rational hourly charge/discharge schedule, daily gross margin and annualized revenue.
+        </p>
+      </div>
+      <div class="badge">Dispatch • Spread Capture • Daily Margin</div>
+    </section>
+
+    <div class="layout">
+      <aside class="panel">
+        <div class="panel-head">
+          <h2>Inputs</h2>
+          <p>Presets generate the price curve automatically. Sliders update the optimization instantly.</p>
+        </div>
+        <div class="inputs">
+          <fieldset>
+            <legend>Battery Setup</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="powerMw">Battery Power</label>
+                <div class="input-wrap has-suffix">
+                  <input id="powerMw" type="number" min="0.1" step="0.1" value="50" />
+                  <span class="suffix">MW</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="duration">Duration</label>
+                <div class="input-wrap has-suffix">
+                  <input id="duration" type="number" min="0.1" step="0.1" value="2" />
+                  <span class="suffix">hrs</span>
+                </div>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label for="rte">Round-Trip Efficiency <strong id="rteValue">88.0%</strong></label>
+                <input id="rte" type="range" min="60" max="98" step="0.5" value="88" />
+              </div>
+              <div class="field">
+                <label for="initialSoc">Initial State of Charge <strong id="initialSocValue">50.0%</strong></label>
+                <input id="initialSoc" type="range" min="0" max="100" step="1" value="50" />
+              </div>
+              <div class="field">
+                <label for="minSoc">Minimum SOC <strong id="minSocValue">10.0%</strong></label>
+                <input id="minSoc" type="range" min="0" max="60" step="1" value="10" />
+              </div>
+              <div class="field">
+                <label for="maxCycles">Max Cycles per Day <strong id="maxCyclesValue">1.5x</strong></label>
+                <input id="maxCycles" type="range" min="0.2" max="3" step="0.1" value="1.5" />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Commercial Assumptions</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="degradationCost">Cycling Cost <strong id="degradationCostValue">EUR 4.0/MWh</strong></label>
+                <input id="degradationCost" type="range" min="0" max="20" step="0.5" value="4" />
+              </div>
+              <div class="field">
+                <label for="annualAvailability">Availability <strong id="annualAvailabilityValue">97.0%</strong></label>
+                <input id="annualAvailability" type="range" min="80" max="100" step="0.5" value="97" />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>24-Hour Price Curve</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="priceLevel">Price Level Preset</label>
+                <select id="priceLevel">
+                  <option value="55">Low Price</option>
+                  <option value="75">Medium Price</option>
+                  <option value="95" selected>High Price</option>
+                  <option value="120">Very High Price</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="volatilityLevel">Volatility Preset</label>
+                <select id="volatilityLevel">
+                  <option value="0.14">Low Volatility</option>
+                  <option value="0.28" selected>Medium Volatility</option>
+                  <option value="0.45">High Volatility</option>
+                  <option value="0.65">Extreme Volatility</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label for="duckCurve">Intraday Shape</label>
+                <select id="duckCurve">
+                  <option value="standard" selected>Standard Peak</option>
+                  <option value="solarHeavy">Solar Heavy / Duck Curve</option>
+                  <option value="eveningPeak">Strong Evening Peak</option>
+                  <option value="flat">Flat Day</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="weekendMode">Day Type</label>
+                <select id="weekendMode">
+                  <option value="weekday" selected>Weekday</option>
+                  <option value="weekend">Weekend</option>
+                </select>
+              </div>
+            </div>
+            <div class="pill-row">
+              <span class="pill">24 hourly prices generated automatically</span>
+              <span class="pill">Level + volatility presets</span>
+              <span class="pill">No manual curve needed</span>
+            </div>
+          </fieldset>
+
+          <div class="actions">
+            <button class="primary" id="calcBtn" type="button">Optimize Dispatch</button>
+            <button class="secondary" id="exampleBtn" type="button">Load Example</button>
+          </div>
+        </div>
+        <div class="error" id="errorBox"></div>
+      </aside>
+
+      <section class="right-col">
+        <div class="panel summary">
+          <div class="kpi-grid-top">
+            <div class="hero-card">
+              <div class="label">Daily Gross Margin</div>
+              <div class="value" id="dailyMargin">—</div>
+              <div class="note" id="summaryNote">Calculated from optimized hourly charge and discharge decisions, net of cycling cost.</div>
+            </div>
+            <div class="mini-stack">
+              <div class="mini-card">
+                <div class="label">Annualized Revenue</div>
+                <div class="value" id="annualRevenue">—</div>
+              </div>
+              <div class="mini-card">
+                <div class="label">Realized Average Spread</div>
+                <div class="value" id="avgSpread">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <div class="label">Usable Energy</div>
+              <div class="num" id="usableEnergy">—</div>
+            </div>
+            <div class="metric">
+              <div class="label">Charged Energy</div>
+              <div class="num" id="chargedEnergy">—</div>
+            </div>
+            <div class="metric">
+              <div class="label">Discharged Energy</div>
+              <div class="num" id="dischargedEnergy">—</div>
+            </div>
+            <div class="metric">
+              <div class="label">Equivalent Cycles</div>
+              <div class="num" id="cycles">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel chart-card">
+          <div class="chart-head">
+            <div>
+              <h3>Hourly Dispatch & Price</h3>
+              <p>The line is the hourly market price. Green bars show discharge, gray-blue bars show charge, and the cyan line shows state of charge.</p>
+            </div>
+            <div class="badge" id="chartBadge">No optimization yet</div>
+          </div>
+          <canvas id="dispatchChart" width="1020" height="320"></canvas>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Dispatch Schedule</h2>
+            <p>Hour-by-hour view of charge, discharge, state of charge and margin contribution.</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Hour</th>
+                  <th>Price</th>
+                  <th>Charge</th>
+                  <th>Discharge</th>
+                  <th>End SOC</th>
+                  <th>Revenue</th>
+                  <th>Energy Cost</th>
+                  <th>Cycling Cost</th>
+                  <th>Net Margin</th>
+                </tr>
+              </thead>
+              <tbody id="scheduleBody"></tbody>
+            </table>
+          </div>
+          <div class="footnote">
+            Simplifications used: 1-hour timestep, no reserve/co-optimization, no grid fees, no auxiliary load, and perfect foresight over the 24-hour price curve.
+            Charging and discharging are optimized for arbitrage only.
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const $ = (id) => {
+        const el = document.getElementById(id);
+        if (!el) throw new Error(`Missing DOM element with id: ${id}`);
+        return el;
+      };
+
+      const fields = {
+        powerMw: $('powerMw'),
+        duration: $('duration'),
+        rte: $('rte'),
+        initialSoc: $('initialSoc'),
+        minSoc: $('minSoc'),
+        maxCycles: $('maxCycles'),
+        degradationCost: $('degradationCost'),
+        annualAvailability: $('annualAvailability'),
+        priceLevel: $('priceLevel'),
+        volatilityLevel: $('volatilityLevel'),
+        duckCurve: $('duckCurve'),
+        weekendMode: $('weekendMode')
+      };
+
+      const outputs = {
+        errorBox: $('errorBox'),
+        dailyMargin: $('dailyMargin'),
+        annualRevenue: $('annualRevenue'),
+        avgSpread: $('avgSpread'),
+        usableEnergy: $('usableEnergy'),
+        chargedEnergy: $('chargedEnergy'),
+        dischargedEnergy: $('dischargedEnergy'),
+        cycles: $('cycles'),
+        summaryNote: $('summaryNote'),
+        chartBadge: $('chartBadge'),
+        scheduleBody: $('scheduleBody'),
+        dispatchChart: $('dispatchChart'),
+        rteValue: $('rteValue'),
+        initialSocValue: $('initialSocValue'),
+        minSocValue: $('minSocValue'),
+        maxCyclesValue: $('maxCyclesValue'),
+        degradationCostValue: $('degradationCostValue'),
+        annualAvailabilityValue: $('annualAvailabilityValue'),
+        calcBtn: $('calcBtn'),
+        exampleBtn: $('exampleBtn')
+      };
+
+      const example = {
+        powerMw: 50,
+        duration: 2,
+        rte: 88,
+        initialSoc: 50,
+        minSoc: 10,
+        maxCycles: 1.5,
+        degradationCost: 4,
+        annualAvailability: 97,
+        priceLevel: '95',
+        volatilityLevel: '0.28',
+        duckCurve: 'standard',
+        weekendMode: 'weekday'
+      };
+
+      function fmtNum(v, d = 0) {
+        return new Intl.NumberFormat('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }).format(v);
+      }
+
+      function fmtCur(v, d = 0) {
+        return `EUR ${fmtNum(v, d)}`;
+      }
+
+      function fmtPct(v, d = 1) {
+        return `${fmtNum(v, d)}%`;
+      }
+
+      function clsBySign(v) {
+        if (v > 0.000001) return 'positive';
+        if (v < -0.000001) return 'negative';
+        return 'neutral';
+      }
+
+      function generatePriceCurve(level, volatility, shape, dayType) {
+        const standard = [0.82,0.76,0.72,0.70,0.69,0.74,0.84,0.96,1.05,1.08,1.02,0.96,0.92,0.91,0.95,1.03,1.16,1.30,1.42,1.38,1.24,1.08,0.96,0.86];
+        const solarHeavy = [0.88,0.82,0.78,0.74,0.70,0.72,0.78,0.84,0.78,0.64,0.56,0.52,0.50,0.52,0.58,0.76,1.08,1.36,1.60,1.52,1.28,1.06,0.96,0.90];
+        const eveningPeak = [0.80,0.76,0.72,0.70,0.68,0.72,0.80,0.90,0.98,1.00,0.96,0.92,0.90,0.92,0.98,1.10,1.30,1.48,1.62,1.56,1.34,1.12,0.96,0.86];
+        const flat = Array(24).fill(1);
+        const weekendAdj = [0.96,0.95,0.94,0.93,0.92,0.93,0.95,0.97,0.98,0.98,0.97,0.96,0.95,0.95,0.96,1.00,1.08,1.16,1.22,1.18,1.08,1.00,0.97,0.95];
+        const baseMap = { standard, solarHeavy, eveningPeak, flat };
+        const base = (baseMap[shape] || standard).slice();
+        const centered = base.map(v => v - 1);
+        return centered.map((v, i) => {
+          const dayMultiplier = dayType === 'weekend' ? weekendAdj[i] : 1;
+          return Math.max(0.15, level * (1 + v * (volatility / 0.28)) * dayMultiplier);
+        });
+      }
+
+      function readInputs() {
+        return {
+          powerMw: Number(fields.powerMw.value),
+          duration: Number(fields.duration.value),
+          rte: Number(fields.rte.value),
+          initialSoc: Number(fields.initialSoc.value),
+          minSoc: Number(fields.minSoc.value),
+          maxCycles: Number(fields.maxCycles.value),
+          degradationCost: Number(fields.degradationCost.value),
+          annualAvailability: Number(fields.annualAvailability.value),
+          priceLevel: Number(fields.priceLevel.value),
+          volatilityLevel: Number(fields.volatilityLevel.value),
+          duckCurve: fields.duckCurve.value,
+          weekendMode: fields.weekendMode.value,
+          prices: generatePriceCurve(Number(fields.priceLevel.value), Number(fields.volatilityLevel.value), fields.duckCurve.value, fields.weekendMode.value)
+        };
+      }
+
+      function validate(v) {
+        const errors = [];
+        if (v.powerMw <= 0) errors.push('Battery power must be greater than zero.');
+        if (v.duration <= 0) errors.push('Duration must be greater than zero.');
+        if (v.rte <= 0 || v.rte > 100) errors.push('Round-trip efficiency must be between 0% and 100%.');
+        if (v.initialSoc < 0 || v.initialSoc > 100) errors.push('Initial SOC must be between 0% and 100%.');
+        if (v.minSoc < 0 || v.minSoc > 100) errors.push('Minimum SOC must be between 0% and 100%.');
+        if (v.minSoc > v.initialSoc) errors.push('Minimum SOC cannot exceed initial SOC.');
+        if (v.maxCycles <= 0) errors.push('Max cycles per day must be greater than zero.');
+        if (v.degradationCost < 0) errors.push('Cycling cost must be zero or greater.');
+        if (v.annualAvailability < 0 || v.annualAvailability > 100) errors.push('Availability must be between 0% and 100%.');
+        if (!Array.isArray(v.prices) || v.prices.length !== 24) errors.push('The generated price curve must contain exactly 24 hourly values.');
+        if (v.prices.some(p => Number.isNaN(p))) errors.push('The generated price curve contains invalid numbers.');
+        return errors;
+      }
+
+      function optimizeDispatch(v) {
+        const capacity = v.powerMw * v.duration;
+        const minEnergy = capacity * (v.minSoc / 100);
+        const startEnergy = capacity * (v.initialSoc / 100);
+        const maxThroughput = capacity * v.maxCycles;
+        const etaC = Math.sqrt(v.rte / 100);
+        const etaD = Math.sqrt(v.rte / 100);
+        const step = 2;
+        const eps = 1e-9;
+
+        const states = [];
+        for (let e = minEnergy; e <= capacity + eps; e += step) states.push(Number(e.toFixed(6)));
+        if (!states.some(s => Math.abs(s - startEnergy) < step / 2)) states.push(startEnergy);
+        states.sort((a, b) => a - b);
+
+        const throughputStates = [];
+        for (let t = 0; t <= maxThroughput + eps; t += step) throughputStates.push(Number(t.toFixed(6)));
+        if (!throughputStates.some(s => Math.abs(s - maxThroughput) < step / 2)) throughputStates.push(maxThroughput);
+        throughputStates.sort((a, b) => a - b);
+
+        const nearestEnergy = (x) => states.reduce((best, cur) => Math.abs(cur - x) < Math.abs(best - x) ? cur : best, states[0]);
+        const nearestThroughput = (x) => throughputStates.reduce((best, cur) => Math.abs(cur - x) < Math.abs(best - x) ? cur : best, throughputStates[0]);
+
+        const key = (h, e, t) => `${h}|${e.toFixed(3)}|${t.toFixed(3)}`;
+        const memo = new Map();
+        const decision = new Map();
+
+        function solve(hour, energy, throughput) {
+          const k = key(hour, energy, throughput);
+          if (memo.has(k)) return memo.get(k);
+          if (hour === 24) {
+            const terminalPenalty = Math.abs(energy - startEnergy) * 0.1;
+            const val = -terminalPenalty;
+            memo.set(k, val);
+            return val;
+          }
+
+          const price = v.prices[hour];
+          let bestValue = -Infinity;
+          let bestAction = { charge: 0, discharge: 0, nextEnergy: energy, nextThroughput: throughput, revenue: 0, energyCost: 0, cyclingCost: 0, netMargin: 0 };
+
+          const maxChargeGrid = Math.max(0, Math.min(v.powerMw, (capacity - energy) / etaC, maxThroughput - throughput));
+          const maxDischargeGrid = Math.max(0, Math.min(v.powerMw, (energy - minEnergy) * etaD, maxThroughput - throughput));
+
+          const chargeOptions = [];
+          for (let c = 0; c <= maxChargeGrid + eps; c += step) chargeOptions.push(Math.min(c, maxChargeGrid));
+          const dischargeOptions = [];
+          for (let d = 0; d <= maxDischargeGrid + eps; d += step) dischargeOptions.push(Math.min(d, maxDischargeGrid));
+
+          for (const charge of chargeOptions) {
+            const nextEnergy = nearestEnergy(Math.min(capacity, energy + charge * etaC));
+            const nextThroughput = nearestThroughput(throughput + charge);
+            const energyCost = charge * price;
+            const cyclingCost = charge * v.degradationCost;
+            const immediate = -(energyCost + cyclingCost);
+            const total = immediate + solve(hour + 1, nextEnergy, nextThroughput);
+            if (total > bestValue) {
+              bestValue = total;
+              bestAction = { charge, discharge: 0, nextEnergy, nextThroughput, revenue: 0, energyCost, cyclingCost, netMargin: immediate };
+            }
+          }
+
+          for (const discharge of dischargeOptions) {
+            const nextEnergy = nearestEnergy(Math.max(minEnergy, energy - discharge / etaD));
+            const nextThroughput = nearestThroughput(throughput + discharge);
+            const revenue = discharge * price;
+            const cyclingCost = discharge * v.degradationCost;
+            const immediate = revenue - cyclingCost;
+            const total = immediate + solve(hour + 1, nextEnergy, nextThroughput);
+            if (total > bestValue) {
+              bestValue = total;
+              bestAction = { charge: 0, discharge, nextEnergy, nextThroughput, revenue, energyCost: 0, cyclingCost, netMargin: immediate };
+            }
+          }
+
+          memo.set(k, bestValue);
+          decision.set(k, bestAction);
+          return bestValue;
+        }
+
+        const startE = nearestEnergy(startEnergy);
+        const startT = nearestThroughput(0);
+        solve(0, startE, startT);
+
+        let energy = startE;
+        let throughput = startT;
+        const schedule = [];
+        let chargedEnergy = 0;
+        let dischargedEnergy = 0;
+        let totalRevenue = 0;
+        let totalEnergyCost = 0;
+        let totalCyclingCost = 0;
+
+        for (let hour = 0; hour < 24; hour++) {
+          const action = decision.get(key(hour, energy, throughput));
+          if (!action) break;
+          chargedEnergy += action.charge;
+          dischargedEnergy += action.discharge;
+          totalRevenue += action.revenue;
+          totalEnergyCost += action.energyCost;
+          totalCyclingCost += action.cyclingCost;
+          schedule.push({
+            hour,
+            price: v.prices[hour],
+            charge: action.charge,
+            discharge: action.discharge,
+            endSocMWh: action.nextEnergy,
+            endSocPct: capacity === 0 ? 0 : (action.nextEnergy / capacity) * 100,
+            revenue: action.revenue,
+            energyCost: action.energyCost,
+            cyclingCost: action.cyclingCost,
+            netMargin: action.netMargin
+          });
+          energy = action.nextEnergy;
+          throughput = action.nextThroughput;
+        }
+
+        const dailyMargin = totalRevenue - totalEnergyCost - totalCyclingCost;
+        const annualRevenue = dailyMargin * 365 * (v.annualAvailability / 100);
+        const realizedSpread = dischargedEnergy > 0 && chargedEnergy > 0
+          ? (totalRevenue / dischargedEnergy) - (totalEnergyCost / chargedEnergy)
+          : 0;
+        const equivalentCycles = capacity > 0 ? dischargedEnergy / capacity : 0;
+
+        return {
+          capacity,
+          usableEnergy: capacity - minEnergy,
+          schedule,
+          chargedEnergy,
+          dischargedEnergy,
+          totalRevenue,
+          totalEnergyCost,
+          totalCyclingCost,
+          dailyMargin,
+          annualRevenue,
+          realizedSpread,
+          equivalentCycles
+        };
+      }
+
+      function renderSummary(v, result) {
+        outputs.dailyMargin.textContent = fmtCur(result.dailyMargin, 0);
+        outputs.annualRevenue.textContent = fmtCur(result.annualRevenue, 0);
+        outputs.avgSpread.textContent = `${fmtCur(result.realizedSpread, 2)}/MWh`;
+        outputs.usableEnergy.textContent = `${fmtNum(result.usableEnergy, 1)} MWh`;
+        outputs.chargedEnergy.textContent = `${fmtNum(result.chargedEnergy, 1)} MWh`;
+        outputs.dischargedEnergy.textContent = `${fmtNum(result.dischargedEnergy, 1)} MWh`;
+        outputs.cycles.textContent = `${fmtNum(result.equivalentCycles, 2)}x`;
+        outputs.summaryNote.textContent = `Optimized for a ${fmtNum(v.powerMw, 1)} MW / ${fmtNum(v.powerMw * v.duration, 1)} MWh battery with ${fmtPct(v.rte, 1)} round-trip efficiency, ${fmtNum(v.maxCycles, 1)} max cycles/day, and a ${fields.priceLevel.options[fields.priceLevel.selectedIndex].text.toLowerCase()} profile with ${fields.volatilityLevel.options[fields.volatilityLevel.selectedIndex].text.toLowerCase()}.`;
+        outputs.chartBadge.textContent = `Daily margin ${fmtCur(result.dailyMargin, 0)}`;
+      }
+
+      function renderSchedule(result) {
+        outputs.scheduleBody.innerHTML = result.schedule.map(r => `
+          <tr>
+            <td>${r.hour}</td>
+            <td>${fmtCur(r.price, 2)}/MWh</td>
+            <td>${fmtNum(r.charge, 1)} MWh</td>
+            <td>${fmtNum(r.discharge, 1)} MWh</td>
+            <td>${fmtNum(r.endSocMWh, 1)} MWh (${fmtNum(r.endSocPct, 0)}%)</td>
+            <td>${fmtCur(r.revenue, 0)}</td>
+            <td>${fmtCur(r.energyCost, 0)}</td>
+            <td>${fmtCur(r.cyclingCost, 0)}</td>
+            <td class="${clsBySign(r.netMargin)}">${fmtCur(r.netMargin, 0)}</td>
+          </tr>
+        `).join('');
+      }
+
+      function renderChart(result) {
+        const canvas = outputs.dispatchChart;
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const cssWidth = canvas.clientWidth || 1020;
+        const cssHeight = 320;
+        canvas.width = cssWidth * dpr;
+        canvas.height = cssHeight * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const width = cssWidth;
+        const height = cssHeight;
+        ctx.clearRect(0, 0, width, height);
+
+        const prices = result.schedule.map(r => r.price);
+        const charge = result.schedule.map(r => r.charge);
+        const discharge = result.schedule.map(r => r.discharge);
+        const soc = result.schedule.map(r => r.endSocPct);
+
+        const maxBar = Math.max(...charge, ...discharge, 1);
+        const maxPrice = Math.max(...prices, 1);
+        const margin = { top: 24, right: 48, bottom: 40, left: 56 };
+        const plotW = width - margin.left - margin.right;
+        const plotH = height - margin.top - margin.bottom;
+        const step = plotW / 24;
+        const barW = Math.min(18, step * 0.38);
+        const zeroY = margin.top + plotH * 0.62;
+
+        for (let i = 0; i <= 4; i++) {
+          const y = margin.top + (plotH / 4) * i;
+          ctx.beginPath();
+          ctx.moveTo(margin.left, y);
+          ctx.lineTo(width - margin.right, y);
+          ctx.strokeStyle = 'rgba(148,163,184,0.18)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(margin.left, zeroY);
+        ctx.lineTo(width - margin.right, zeroY);
+        ctx.strokeStyle = 'rgba(100,116,139,0.45)';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        result.schedule.forEach((r, i) => {
+          const cx = margin.left + step * i + step / 2;
+          const chargeH = (r.charge / maxBar) * (plotH * 0.32);
+          const dischargeH = (r.discharge / maxBar) * (plotH * 0.32);
+          if (r.charge > 0) {
+            ctx.fillStyle = 'rgba(148,163,184,0.65)';
+            roundRect(ctx, cx - barW - 1, zeroY, barW, chargeH, 8, true, false, true);
+          }
+          if (r.discharge > 0) {
+            ctx.fillStyle = 'rgba(22,163,74,0.75)';
+            roundRect(ctx, cx + 1, zeroY - dischargeH, barW, dischargeH, 8, true, false, false);
+          }
+        });
+
+        ctx.beginPath();
+        prices.forEach((p, i) => {
+          const x = margin.left + step * i + step / 2;
+          const y = margin.top + (1 - p / maxPrice) * (plotH * 0.48);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = '#2563eb';
+        ctx.lineWidth = 2.4;
+        ctx.stroke();
+
+        ctx.beginPath();
+        soc.forEach((s, i) => {
+          const x = margin.left + step * i + step / 2;
+          const y = margin.top + plotH * 0.70 + (1 - s / 100) * (plotH * 0.26);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = '#06b6d4';
+        ctx.lineWidth = 2.2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '12px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        for (let i = 0; i < 24; i++) {
+          const x = margin.left + step * i + step / 2;
+          if (i < 23) ctx.fillText(String(i), x, height - 12);
+        }
+
+        ctx.fillStyle = '#2563eb';
+        ctx.fillRect(margin.left, 10, 12, 12);
+        ctx.fillStyle = '#0f172a';
+        ctx.fillText('Price', margin.left + 35, 20);
+        ctx.fillStyle = 'rgba(22,163,74,0.75)';
+        ctx.fillRect(margin.left + 90, 10, 12, 12);
+        ctx.fillStyle = '#0f172a';
+        ctx.fillText('Discharge', margin.left + 135, 20);
+        ctx.fillStyle = 'rgba(148,163,184,0.75)';
+        ctx.fillRect(margin.left + 210, 10, 12, 12);
+        ctx.fillStyle = '#0f172a';
+        ctx.fillText('Charge', margin.left + 245, 20);
+        ctx.fillStyle = '#06b6d4';
+        ctx.fillRect(margin.left + 305, 10, 12, 12);
+        ctx.fillStyle = '#0f172a';
+        ctx.fillText('SOC', margin.left + 335, 20);
+      }
+
+      function roundRect(ctx, x, y, w, h, r, fill, stroke, down = false) {
+        if (w < 2 * r) r = w / 2;
+        if (Math.abs(h) < 2 * r) r = Math.abs(h) / 2;
+        const hh = Math.abs(h);
+        const yy = y;
+        ctx.beginPath();
+        if (down) {
+          ctx.moveTo(x + r, yy);
+          ctx.lineTo(x + w - r, yy);
+          ctx.quadraticCurveTo(x + w, yy, x + w, yy + r);
+          ctx.lineTo(x + w, yy + hh - r);
+          ctx.quadraticCurveTo(x + w, yy + hh, x + w - r, yy + hh);
+          ctx.lineTo(x + r, yy + hh);
+          ctx.quadraticCurveTo(x, yy + hh, x, yy + hh - r);
+          ctx.lineTo(x, yy + r);
+          ctx.quadraticCurveTo(x, yy, x + r, yy);
+        } else {
+          ctx.moveTo(x + r, y);
+          ctx.lineTo(x + w - r, y);
+          ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+          ctx.lineTo(x + w, y + hh - r);
+          ctx.quadraticCurveTo(x + w, y + hh, x + w - r, y + hh);
+          ctx.lineTo(x + r, y + hh);
+          ctx.quadraticCurveTo(x, y + hh, x, y + hh - r);
+          ctx.lineTo(x, y + r);
+          ctx.quadraticCurveTo(x, y, x + r, y);
+        }
+        ctx.closePath();
+        if (fill) ctx.fill();
+        if (stroke) ctx.stroke();
+      }
+
+      function showError(msg) {
+        if (msg) {
+          outputs.errorBox.style.display = 'block';
+          outputs.errorBox.textContent = msg;
+        } else {
+          outputs.errorBox.style.display = 'none';
+          outputs.errorBox.textContent = '';
+        }
+      }
+
+      function updateSliderLabels() {
+        outputs.rteValue.textContent = fmtPct(Number(fields.rte.value), 1);
+        outputs.initialSocValue.textContent = fmtPct(Number(fields.initialSoc.value), 1);
+        outputs.minSocValue.textContent = fmtPct(Number(fields.minSoc.value), 1);
+        outputs.maxCyclesValue.textContent = `${fmtNum(Number(fields.maxCycles.value), 1)}x`;
+        outputs.degradationCostValue.textContent = `${fmtCur(Number(fields.degradationCost.value), 1)}/MWh`;
+        outputs.annualAvailabilityValue.textContent = fmtPct(Number(fields.annualAvailability.value), 1);
+      }
+
+      function runSelfTests() {
+        const curve = generatePriceCurve(95, 0.28, 'standard', 'weekday');
+        console.assert(curve.length === 24, 'Test failed: price curve must have 24 values');
+        console.assert(curve.every(v => Number.isFinite(v) && v > 0), 'Test failed: prices must be positive finite numbers');
+        const model = optimizeDispatch({
+          powerMw: 10,
+          duration: 2,
+          rte: 88,
+          initialSoc: 50,
+          minSoc: 10,
+          maxCycles: 1.5,
+          degradationCost: 4,
+          annualAvailability: 97,
+          priceLevel: 95,
+          volatilityLevel: 0.28,
+          duckCurve: 'standard',
+          weekendMode: 'weekday',
+          prices: curve
+        });
+        console.assert(Array.isArray(model.schedule) && model.schedule.length === 24, 'Test failed: schedule must contain 24 rows');
+        console.assert(model.capacity === 20, 'Test failed: capacity should equal power × duration');
+      }
+
+      function loadExample() {
+        Object.entries(example).forEach(([k, v]) => {
+          fields[k].value = v;
+        });
+        updateSliderLabels();
+        run();
+      }
+
+      function run() {
+        try {
+          const v = readInputs();
+          const errors = validate(v);
+          if (errors.length) {
+            showError(errors.join(' '));
+            return;
+          }
+          showError('');
+          const result = optimizeDispatch(v);
+          renderSummary(v, result);
+          renderSchedule(result);
+          renderChart(result);
+        } catch (err) {
+          console.error(err);
+          showError(err instanceof Error ? err.message : 'Unexpected error while running the model.');
+        }
+      }
+
+      outputs.calcBtn.addEventListener('click', run);
+      outputs.exampleBtn.addEventListener('click', loadExample);
+
+      ['rte','initialSoc','minSoc','maxCycles','degradationCost','annualAvailability'].forEach((id) => {
+        fields[id].addEventListener('input', () => {
+          updateSliderLabels();
+          run();
+        });
+      });
+
+      ['priceLevel','volatilityLevel','duckCurve','weekendMode'].forEach((id) => {
+        fields[id].addEventListener('change', run);
+      });
+
+      ['powerMw','duration'].forEach((id) => {
+        fields[id].addEventListener('input', run);
+      });
+
+      window.addEventListener('resize', () => {
+        try {
+          const v = readInputs();
+          const errors = validate(v);
+          if (!errors.length) renderChart(optimizeDispatch(v));
+        } catch (err) {
+          console.error(err);
+        }
+      });
+
+      runSelfTests();
+      loadExample();
+    });
+  </script>
+</body>
+</html>
