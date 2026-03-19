@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Financing Dashboard</title>
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --panel: rgba(255,255,255,0.78);
+      --panel-strong: rgba(255,255,255,0.94);
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent-2: #06b6d4;
+      --good: #16a34a;
+      --bad: #dc2626;
+      --warn: #d97706;
+      --border: rgba(148,163,184,0.22);
+      --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(6,182,212,0.10), transparent 22%),
+        linear-gradient(180deg, #f8fbff 0%, #f6f8fc 100%);
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(32px, 4.3vw, 52px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      max-width: 880px;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+      box-shadow: var(--shadow);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 430px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 22px 22px 14px;
+      border-bottom: 1px solid rgba(148,163,184,0.16);
+      background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.40));
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .inputs {
+      padding: 20px 22px 22px;
+      display: grid;
+      gap: 18px;
+    }
+
+    fieldset {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    legend {
+      padding: 0;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .grid-2, .grid-3 {
+      display: grid;
+      gap: 12px;
+    }
+
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .prefix, .suffix {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 12px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .prefix { left: 12px; }
+    .suffix { right: 12px; }
+
+    input, select {
+      width: 100%;
+      border: 1px solid rgba(148,163,184,0.24);
+      background: rgba(255,255,255,0.92);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 13px 14px;
+      font-size: 14px;
+      outline: none;
+      transition: 0.18s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+
+    .has-prefix input { padding-left: 28px; }
+    .has-suffix input, .has-suffix select { padding-right: 54px; }
+
+    input:focus, select:focus {
+      border-color: rgba(37,99,235,0.45);
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.10);
+      transform: translateY(-1px);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-top: 4px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 16px;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      box-shadow: 0 14px 28px rgba(37,99,235,0.20);
+    }
+
+    .secondary {
+      background: rgba(255,255,255,0.92);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .right-col {
+      display: grid;
+      gap: 24px;
+    }
+
+    .summary {
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .kpi-grid-top {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 16px;
+    }
+
+    .hero-card, .mini-stack, .metric {
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+    }
+
+    .hero-card {
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(37,99,235,0.92), rgba(6,182,212,0.88));
+      color: white;
+      border: 0;
+      box-shadow: 0 22px 40px rgba(37,99,235,0.22);
+    }
+
+    .hero-card .label,
+    .mini-card .label,
+    .metric .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.85;
+    }
+
+    .hero-card .value {
+      margin-top: 10px;
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 0.95;
+    }
+
+    .hero-card .note {
+      margin-top: 10px;
+      font-size: 14px;
+      line-height: 1.45;
+      max-width: 56ch;
+      color: rgba(255,255,255,0.88);
+    }
+
+    .mini-stack {
+      display: grid;
+      gap: 14px;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+
+    .mini-card {
+      background: var(--panel-strong);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+    }
+
+    .mini-card .value {
+      margin-top: 10px;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .metric {
+      padding: 16px;
+    }
+
+    .metric .num {
+      margin-top: 8px;
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .chart-card {
+      padding: 20px 22px 16px;
+    }
+
+    .chart-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .chart-head h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .chart-head p {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+      max-width: 66ch;
+    }
+
+    canvas {
+      width: 100%;
+      height: 320px;
+      display: block;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(248,250,252,0.92));
+    }
+
+    .table-wrap {
+      padding: 0 22px 22px;
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 880px;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: right;
+      border-bottom: 1px solid rgba(148,163,184,0.16);
+      font-size: 13px;
+    }
+
+    th:first-child, td:first-child { text-align: left; }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(10px);
+    }
+
+    tbody tr:hover td {
+      background: rgba(37,99,235,0.03);
+    }
+
+    .positive { color: var(--good); font-weight: 800; }
+    .negative { color: var(--bad); font-weight: 800; }
+    .neutral { color: var(--muted); font-weight: 800; }
+
+    .error {
+      display: none;
+      color: var(--bad);
+      font-size: 13px;
+      padding: 0 22px 20px;
+      font-weight: 700;
+    }
+
+    .footnote {
+      padding: 0 22px 22px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1220px) {
+      .layout { grid-template-columns: 1fr; }
+      .kpi-grid-top, .metrics { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .shell { padding: 16px; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .hero { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div>
+        <h1>Project Financing Dashboard</h1>
+        <p>
+          A simplified project-finance model for a renewable asset. Enter economics, volumes, curtailment, degradation, commercial structure and financing assumptions.
+          The dashboard estimates equity NPV, equity IRR, annual DSCR and price sensitivity on IRR.
+        </p>
+      </div>
+      <div class="badge">NPV • IRR • DSCR • Price Sensitivity</div>
+    </section>
+
+    <div class="layout">
+      <aside class="panel">
+        <div class="panel-head">
+          <h2>Inputs</h2>
+          <p>All assumptions are annual and simplified for fast scenario testing.</p>
+        </div>
+        <div class="inputs">
+          <fieldset>
+            <legend>Project Setup</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="life">Project Life</label>
+                <div class="input-wrap has-suffix">
+                  <input id="life" type="number" min="1" step="1" value="25" />
+                  <span class="suffix">yrs</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="mw">Capacity</label>
+                <div class="input-wrap has-suffix">
+                  <input id="mw" type="number" min="0" step="0.1" value="50" />
+                  <span class="suffix">MW</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="yield">Year 1 Yield</label>
+                <div class="input-wrap has-suffix">
+                  <input id="yield" type="number" min="0" step="1" value="1400" />
+                  <span class="suffix">MWh/MW</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="deg">Degradation</label>
+                <div class="input-wrap has-suffix">
+                  <input id="deg" type="number" min="0" max="100" step="0.01" value="0.5" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="curt">Curtailment</label>
+                <div class="input-wrap has-suffix">
+                  <input id="curt" type="number" min="0" max="100" step="0.1" value="3" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="opexEsc">OPEX Escalation</label>
+                <div class="input-wrap has-suffix">
+                  <input id="opexEsc" type="number" min="0" max="100" step="0.1" value="2" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Costs & Commercials</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="capex">CAPEX</label>
+                <div class="input-wrap has-prefix has-suffix">
+                  <span class="prefix">€</span>
+                  <input id="capex" type="number" min="0" step="1000" value="900000" />
+                  <span class="suffix">/MW</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="opex">Annual OPEX</label>
+                <div class="input-wrap has-prefix has-suffix">
+                  <span class="prefix">€</span>
+                  <input id="opex" type="number" min="0" step="100" value="18000" />
+                  <span class="suffix">/MW</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="fixedPrice">Fixed Price</label>
+                <div class="input-wrap has-prefix has-suffix">
+                  <span class="prefix">€</span>
+                  <input id="fixedPrice" type="number" min="0" step="0.1" value="85" />
+                  <span class="suffix">/MWh</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="fixedShare">Fixed Share</label>
+                <div class="input-wrap has-suffix">
+                  <input id="fixedShare" type="number" min="0" max="100" step="0.1" value="60" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="price">Merchant Price</label>
+                <div class="input-wrap has-prefix has-suffix">
+                  <span class="prefix">€</span>
+                  <input id="price" type="number" min="0" step="0.1" value="90" />
+                  <span class="suffix">/MWh</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="priceEsc">Merchant Price Escalation</label>
+                <div class="input-wrap has-suffix">
+                  <input id="priceEsc" type="number" min="-100" max="100" step="0.1" value="1" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Financing</legend>
+            <div class="grid-2">
+              <div class="field">
+                <label for="debtPct">Debt Share</label>
+                <div class="input-wrap has-suffix">
+                  <input id="debtPct" type="number" min="0" max="100" step="0.1" value="70" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="tenor">Debt Tenor</label>
+                <div class="input-wrap has-suffix">
+                  <input id="tenor" type="number" min="1" step="1" value="15" />
+                  <span class="suffix">yrs</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="costDebt">Cost of Debt</label>
+                <div class="input-wrap has-suffix">
+                  <input id="costDebt" type="number" min="0" max="100" step="0.1" value="4" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="costEq">Cost of Equity / Discount Rate</label>
+                <div class="input-wrap has-suffix">
+                  <input id="costEq" type="number" min="0" max="100" step="0.1" value="10" />
+                  <span class="suffix">%</span>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="actions">
+            <button class="primary" id="calcBtn" type="button">Calculate Model</button>
+            <button class="secondary" id="exampleBtn" type="button">Load Example</button>
+          </div>
+        </div>
+        <div class="error" id="errorBox"></div>
+      </aside>
+
+      <section class="right-col">
+        <div class="panel summary">
+          <div class="kpi-grid-top">
+            <div class="hero-card">
+              <div class="label">Equity IRR</div>
+              <div class="value" id="irr">—</div>
+              <div class="note" id="summaryNote">Based on simplified annual equity cash flows after OPEX and debt service.</div>
+            </div>
+            <div class="mini-stack">
+              <div class="mini-card">
+                <div class="label">Equity NPV</div>
+                <div class="value" id="npv">—</div>
+              </div>
+              <div class="mini-card">
+                <div class="label">Minimum DSCR</div>
+                <div class="value" id="dscr">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <div class="label">Total CAPEX</div>
+              <div class="num" id="totalCapex">—</div>
+            </div>
+            <div class="metric">
+              <div class="label">Base Revenue Y1</div>
+              <div class="num" id="rev1">—</div>
+            </div>
+            <div class="metric">
+              <div class="label">Equity Invested</div>
+              <div class="num" id="equity">—</div>
+            </div>
+            <div class="metric">
+              <div class="label">Debt Raised</div>
+              <div class="num" id="debt">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel chart-card">
+          <div class="chart-head">
+            <div>
+              <h3>IRR Price Sensitivity</h3>
+              <p>IRR under merchant price downside, base and upside scenarios. The sensitivity shocks the merchant price by -10%, 0% and +10%.</p>
+            </div>
+            <div class="badge" id="chartBadge">No calculation yet</div>
+          </div>
+          <canvas id="sensChart" width="980" height="320"></canvas>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Price Sensitivity Table</h2>
+            <p>Useful for quick valuation screening and commercial downside checks.</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th>Merchant Price</th>
+                  <th>IRR</th>
+                  <th>Δ vs Base</th>
+                </tr>
+              </thead>
+              <tbody id="sens"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Annual Cash Flow Schedule</h2>
+            <p>Annual generation, revenue, OPEX, debt service, equity cash flow and period DSCR.</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Net Energy</th>
+                  <th>Revenue</th>
+                  <th>OPEX</th>
+                  <th>Debt Service</th>
+                  <th>CFADS</th>
+                  <th>Equity CF</th>
+                  <th>DSCR</th>
+                </tr>
+              </thead>
+              <tbody id="cf"></tbody>
+            </table>
+          </div>
+          <div class="footnote">
+            Simplifications used: annual model, straight-line principal amortization, yearly interest on opening debt balance, no taxes, no reserve accounts, no grace period, and no sculpting.
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const fields = {
+      life: $('life'),
+      mw: $('mw'),
+      yield: $('yield'),
+      deg: $('deg'),
+      curt: $('curt'),
+      opexEsc: $('opexEsc'),
+      capex: $('capex'),
+      opex: $('opex'),
+      fixedPrice: $('fixedPrice'),
+      fixedShare: $('fixedShare'),
+      price: $('price'),
+      priceEsc: $('priceEsc'),
+      debtPct: $('debtPct'),
+      tenor: $('tenor'),
+      costDebt: $('costDebt'),
+      costEq: $('costEq')
+    };
+
+    const example = {
+      life: 25,
+      mw: 50,
+      yield: 1400,
+      deg: 0.5,
+      curt: 3,
+      opexEsc: 2,
+      capex: 900000,
+      opex: 18000,
+      fixedPrice: 85,
+      fixedShare: 60,
+      price: 90,
+      priceEsc: 1,
+      debtPct: 70,
+      tenor: 15,
+      costDebt: 4,
+      costEq: 10
+    };
+
+    function fmtNum(v, d = 0) {
+      return new Intl.NumberFormat('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }).format(v);
+    }
+
+    function fmtCur(v, d = 0) {
+      return `EUR ${fmtNum(v, d)}`;
+    }
+
+    function fmtPct(v, d = 1) {
+      return `${fmtNum(v, d)}%`;
+    }
+
+    function clsBySign(v) {
+      if (v > 0.000001) return 'positive';
+      if (v < -0.000001) return 'negative';
+      return 'neutral';
+    }
+
+    function readInputs() {
+      const obj = {};
+      for (const [k, el] of Object.entries(fields)) obj[k] = Number(el.value);
+      return obj;
+    }
+
+    function validate(v) {
+      const errors = [];
+      if (v.life < 1) errors.push('Project life must be at least 1 year.');
+      if (v.mw <= 0) errors.push('Capacity must be greater than zero.');
+      if (v.yield <= 0) errors.push('Yield must be greater than zero.');
+      if (v.deg < 0 || v.deg >= 100) errors.push('Degradation must be between 0% and 100% (excluded).');
+      if (v.curt < 0 || v.curt >= 100) errors.push('Curtailment must be between 0% and 100% (excluded).');
+      if (v.fixedShare < 0 || v.fixedShare > 100) errors.push('Fixed share must be between 0% and 100%.');
+      if (v.debtPct < 0 || v.debtPct > 100) errors.push('Debt share must be between 0% and 100%.');
+      if (v.tenor < 1) errors.push('Debt tenor must be at least 1 year.');
+      if (v.tenor > v.life) errors.push('Debt tenor cannot exceed project life.');
+      if (v.costDebt < 0 || v.costEq < 0) errors.push('Debt cost and equity discount rate must be zero or greater.');
+      if (v.capex < 0 || v.opex < 0 || v.fixedPrice < 0 || v.price < 0) errors.push('CAPEX, OPEX and prices must be zero or greater.');
+      return errors;
+    }
+
+    function npv(rate, cashflows) {
+      return cashflows.reduce((acc, cf, i) => acc + cf / Math.pow(1 + rate, i), 0);
+    }
+
+    function irr(cashflows) {
+      let low = -0.99;
+      let high = 3.0;
+      let fLow = npv(low, cashflows);
+      let fHigh = npv(high, cashflows);
+      let guard = 0;
+      while (fLow * fHigh > 0 && guard < 40) {
+        high += 2;
+        fHigh = npv(high, cashflows);
+        guard++;
+      }
+      if (fLow * fHigh > 0) return null;
+      for (let i = 0; i < 120; i++) {
+        const mid = (low + high) / 2;
+        const fMid = npv(mid, cashflows);
+        if (Math.abs(fMid) < 1e-8) return mid;
+        if (fLow * fMid < 0) {
+          high = mid;
+          fHigh = fMid;
+        } else {
+          low = mid;
+          fLow = fMid;
+        }
+      }
+      return (low + high) / 2;
+    }
+
+    function buildModel(v, merchantPriceMultiplier = 1) {
+      const deg = v.deg / 100;
+      const curt = v.curt / 100;
+      const fixedShare = v.fixedShare / 100;
+      const debtShare = v.debtPct / 100;
+      const costDebt = v.costDebt / 100;
+      const discEq = v.costEq / 100;
+      const opexEsc = v.opexEsc / 100;
+      const priceEsc = v.priceEsc / 100;
+
+      const totalCapex = v.capex * v.mw;
+      const debt = totalCapex * debtShare;
+      const equity = totalCapex - debt;
+      const annualPrincipal = v.tenor > 0 ? debt / v.tenor : 0;
+
+      let outstanding = debt;
+      let minDSCR = Infinity;
+      let year1Revenue = 0;
+      const rows = [];
+      const eqCashflows = [-equity];
+
+      for (let year = 1; year <= v.life; year++) {
+        const grossEnergy = v.yield * v.mw * Math.pow(1 - deg, year - 1);
+        const netEnergy = grossEnergy * (1 - curt);
+        const merchantPrice = v.price * merchantPriceMultiplier * Math.pow(1 + priceEsc, year - 1);
+        const blendedPrice = fixedShare * v.fixedPrice + (1 - fixedShare) * merchantPrice;
+        const revenue = netEnergy * blendedPrice;
+        const opex = v.opex * v.mw * Math.pow(1 + opexEsc, year - 1);
+        const interest = year <= v.tenor ? outstanding * costDebt : 0;
+        const principal = year <= v.tenor ? Math.min(annualPrincipal, outstanding) : 0;
+        const debtService = interest + principal;
+        const cfads = revenue - opex;
+        const equityCF = cfads - debtService;
+        const dscr = debtService > 0 ? cfads / debtService : null;
+
+        if (year === 1) year1Revenue = revenue;
+        if (dscr !== null) minDSCR = Math.min(minDSCR, dscr);
+
+        rows.push({ year, netEnergy, revenue, opex, debtService, cfads, equityCF, dscr });
+        eqCashflows.push(equityCF);
+        outstanding = Math.max(0, outstanding - principal);
+      }
+
+      return {
+        totalCapex,
+        debt,
+        equity,
+        year1Revenue,
+        minDSCR: Number.isFinite(minDSCR) ? minDSCR : null,
+        eqCashflows,
+        eqIRR: irr(eqCashflows),
+        eqNPV: npv(discEq, eqCashflows),
+        rows
+      };
+    }
+
+    function renderSummary(v, model) {
+      $('irr').textContent = model.eqIRR === null ? 'n.a.' : fmtPct(model.eqIRR * 100, 1);
+      $('npv').textContent = fmtCur(model.eqNPV, 0);
+      $('dscr').textContent = model.minDSCR === null ? 'n.a.' : fmtNum(model.minDSCR, 2) + 'x';
+      $('totalCapex').textContent = fmtCur(model.totalCapex, 0);
+      $('rev1').textContent = fmtCur(model.year1Revenue, 0);
+      $('equity').textContent = fmtCur(model.equity, 0);
+      $('debt').textContent = fmtCur(model.debt, 0);
+      $('summaryNote').textContent = `Base-case model assumes ${fmtPct(v.fixedShare, 1)} fixed-price revenue at EUR ${fmtNum(v.fixedPrice, 2)}/MWh and merchant price starting at EUR ${fmtNum(v.price, 2)}/MWh.`;
+      $('chartBadge').textContent = model.eqIRR === null ? 'IRR unavailable' : `Base IRR ${fmtPct(model.eqIRR * 100, 1)}`;
+    }
+
+    function renderCashflowTable(model) {
+      $('cf').innerHTML = model.rows.map(r => `
+        <tr>
+          <td>${r.year}</td>
+          <td>${fmtNum(r.netEnergy, 0)} MWh</td>
+          <td>${fmtCur(r.revenue, 0)}</td>
+          <td>${fmtCur(r.opex, 0)}</td>
+          <td>${fmtCur(r.debtService, 0)}</td>
+          <td>${fmtCur(r.cfads, 0)}</td>
+          <td class="${clsBySign(r.equityCF)}">${fmtCur(r.equityCF, 0)}</td>
+          <td>${r.dscr === null ? '—' : fmtNum(r.dscr, 2) + 'x'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderSensitivity(v, baseModel) {
+      const scenarios = [
+        { name: 'Low', mult: 0.90 },
+        { name: 'Base', mult: 1.00 },
+        { name: 'High', mult: 1.10 }
+      ].map(s => {
+        const model = buildModel(v, s.mult);
+        return {
+          ...s,
+          price: v.price * s.mult,
+          irr: model.eqIRR,
+          delta: baseModel.eqIRR === null || model.eqIRR === null ? null : (model.eqIRR - baseModel.eqIRR)
+        };
+      });
+
+      $('sens').innerHTML = scenarios.map(s => `
+        <tr>
+          <td>${s.name}</td>
+          <td>${fmtCur(s.price, 2)}/MWh</td>
+          <td>${s.irr === null ? 'n.a.' : fmtPct(s.irr * 100, 1)}</td>
+          <td class="${s.delta === null ? 'neutral' : clsBySign(s.delta)}">${s.delta === null ? '—' : (s.delta > 0 ? '+' : '') + fmtPct(s.delta * 100, 1)}</td>
+        </tr>
+      `).join('');
+
+      renderChart(scenarios);
+    }
+
+    function renderChart(scenarios) {
+      const canvas = $('sensChart');
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const cssWidth = canvas.clientWidth || 980;
+      const cssHeight = 320;
+      canvas.width = cssWidth * dpr;
+      canvas.height = cssHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const width = cssWidth;
+      const height = cssHeight;
+      ctx.clearRect(0, 0, width, height);
+
+      const values = scenarios.map(s => s.irr === null ? 0 : s.irr * 100);
+      const maxVal = Math.max(...values, 1) * 1.18;
+      const margin = { top: 24, right: 20, bottom: 40, left: 56 };
+      const plotW = width - margin.left - margin.right;
+      const plotH = height - margin.top - margin.bottom;
+      const step = plotW / scenarios.length;
+      const barW = Math.min(120, step * 0.58);
+
+      for (let i = 0; i <= 4; i++) {
+        const y = margin.top + (plotH / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(margin.left, y);
+        ctx.lineTo(width - margin.right, y);
+        ctx.strokeStyle = 'rgba(148,163,184,0.18)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        const label = maxVal * (1 - i / 4);
+        ctx.fillStyle = '#64748b';
+        ctx.font = '12px Inter, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(fmtNum(label, 0) + '%', margin.left - 8, y + 4);
+      }
+
+      scenarios.forEach((s, i) => {
+        const val = s.irr === null ? 0 : s.irr * 100;
+        const x = margin.left + step * i + step / 2;
+        const h = (val / maxVal) * plotH;
+        const y = margin.top + plotH - h;
+        const grad = ctx.createLinearGradient(0, y, 0, margin.top + plotH);
+        grad.addColorStop(0, i === 1 ? '#2563eb' : (i === 0 ? '#94a3b8' : '#06b6d4'));
+        grad.addColorStop(1, i === 1 ? 'rgba(37,99,235,0.18)' : 'rgba(6,182,212,0.10)');
+        ctx.fillStyle = grad;
+        const rx = x - barW / 2;
+        roundRect(ctx, rx, y, barW, h, 18, true, false);
+
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '700 13px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(s.name, x, height - 14);
+        ctx.font = '800 14px Inter, sans-serif';
+        ctx.fillText(s.irr === null ? 'n.a.' : fmtNum(val, 1) + '%', x, y - 10);
+      });
+    }
+
+    function roundRect(ctx, x, y, w, h, r, fill, stroke) {
+      if (w < 2 * r) r = w / 2;
+      if (h < 2 * r) r = h / 2;
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    function showError(msg) {
+      const el = $('errorBox');
+      if (msg) {
+        el.style.display = 'block';
+        el.textContent = msg;
+      } else {
+        el.style.display = 'none';
+        el.textContent = '';
+      }
+    }
+
+    function loadExample() {
+      Object.entries(example).forEach(([k, v]) => fields[k].value = v);
+      run();
+    }
+
+    function run() {
+      const v = readInputs();
+      const errors = validate(v);
+      if (errors.length) {
+        showError(errors.join(' '));
+        return;
+      }
+      showError('');
+      const model = buildModel(v, 1);
+      renderSummary(v, model);
+      renderCashflowTable(model);
+      renderSensitivity(v, model);
+    }
+
+    $('calcBtn').addEventListener('click', run);
+    $('exampleBtn').addEventListener('click', loadExample);
+    window.addEventListener('resize', () => {
+      const v = readInputs();
+      const errors = validate(v);
+      if (!errors.length) renderSensitivity(v, buildModel(v, 1));
+    });
+
+    loadExample();
+  </script>
+</body>
+</html>
