@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Energy Investments Toolkit</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --accent: #2563eb;
+      --radius: 16px;
+      --shadow: 0 10px 25px rgba(0,0,0,0.06);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 32px;
+    }
+
+    .header {
+      margin-bottom: 28px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 40px;
+      letter-spacing: -0.03em;
+    }
+
+    .header p {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transition: all 0.15s ease;
+      min-height: 180px;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .card p {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .card-footer {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .tag {
+      color: var(--accent);
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 720px) {
+      .container { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <h1>Energy Investments Toolkit</h1>
+      <p>Useful tools for quick investment and commercial evaluations.</p>
+    </div>
+
+    <div class="grid">
+
+      <a class="card" href="lcoe_dashboard.html">
+        <div class="card-top">
+          <span>Module 01</span>
+          <span>Economics</span>
+        </div>
+        <h3>LCOE Dashboard</h3>
+        <p>Calculate levelized cost of energy with CAPEX, OPEX, financing, yield and degradation.</p>
+        <div class="card-footer">
+          <span class="tag">Core Economics</span>
+          <span>Open →</span>
+        </div>
+      </a>
+
+      <a class="card" href="sensitivity_dashboard.html">
+        <div class="card-top">
+          <span>Module 02</span>
+          <span>Risk</span>
+        </div>
+        <h3>Sensitivity Dashboard</h3>
+        <p>Test downside, base and upside movements across key assumptions.</p>
+        <div class="card-footer">
+          <span class="tag">Risk Analysis</span>
+          <span>Open →</span>
+        </div>
+      </a>
+
+      <a class="card" href="portfolio_price_sensitivity_dashboard.html">
+        <div class="card-top">
+          <span>Module 03</span>
+          <span>Financing</span>
+        </div>
+        <h3>Project Financing Dashboard</h3>
+        <p>Run simplified project-finance analytics including NPV, IRR and DSCR.</p>
+        <div class="card-footer">
+          <span class="tag">Financing</span>
+          <span>Open →</span>
+        </div>
+      </a>
+
+      <a class="card" href="battery_arbitrage_tool.html">
+        <div class="card-top">
+          <span>Module 04</span>
+          <span>Storage</span>
+        </div>
+        <h3>Battery Arbitrage Tool</h3>
+        <p>Optimize storage dispatch based on price scenarios and constraints.</p>
+        <div class="card-footer">
+          <span class="tag">Storage</span>
+          <span>Open →</span>
+        </div>
+      </a>
+
+      <div class="card">
+        <div class="card-top">
+          <span>Module 05</span>
+          <span>Reserved</span>
+        </div>
+        <h3>Add New Tool</h3>
+        <p>New tools may be added in the future.</p>
+        <div class="card-footer">
+          <span class="tag">Coming Soon</span>
+          <span>—</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      Disclaimer: these tools are provided for indicative analysis only. Use them with professional judgment and verify all assumptions and outputs independently.
+    </div>
+
+  </div>
+</body>
+</html>
